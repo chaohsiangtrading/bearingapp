@@ -3,162 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>軸承即時查詢與分級系統</title>
-    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <title>才富軸承庫存查詢系統</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f5f5f5; color: #333; }
-        .header { background: #06c755; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .search-box { margin-bottom: 20px; display: flex; gap: 10px; }
-        input { padding: 10px; flex: 1; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; font-size: 16px; background-color: #06c755; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; color: white; }
-        .tier-S { background-color: #ff4757; }
-        .tier-A { background-color: #ffa502; }
-        .tier-B { background-color: #2ed573; }
-        .tier-C { background-color: #747d8c; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.5rem; color: #333; text-align: center; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 10px; font-size: 1rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; font-size: 1rem; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #loading { text-align: center; color: #666; margin: 20px 0; display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f1f3f5; }
+        .error { color: red; text-align: center; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h3 id="user-greeting">載入中...</h3>
-        <p id="user-tier-info" style="margin: 5px 0 0 0; font-size: 14px;"></p>
-    </div>
-
+<div class="container">
+    <h1>才富軸承庫存查詢</h1>
     <div class="search-box">
-        <input type="text" id="keyword" placeholder="輸入軸承型號（例如：32015）">
-        <button onclick="searchBearing()">查詢</button>
+        <input type="text" id="searchInput" placeholder="輸入產品編號或品名關鍵字 (例如: 6205)..." onkeypress="if(event.key === 'Enter') handleSearch()">
+        <button onclick="handleSearch()">搜尋</button>
     </div>
+    
+    <div id="loading">查詢中，請稍候...</div>
+    <div id="resultContainer"></div>
+</div>
 
-    <div id="result"></div>
+<script>
+    // ⚠️ 請務必將此處替換為您最新部署成功且結尾是 /exec 的 GAS 網址
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyLkDA97xit5BFbtyHizO8oKll82tg3ISb0aiEh7tDMiBrV1v-vFMzpFvfJ74xyxM5B/exec";
 
-    <script>
-        // 替換成你的 Google Apps Script 網頁應用程式網址
-        const API_URL = "https://script.google.com/macros/library/d/1TKdi7Pfo6z6591E--vK6FIucDZlBs97q5ySNyEUs5v84Uk1UXmxgZWGS/3"
-        let currentUserTier = 'C'; // 預設C級
+    async function handleSearch() {
+        const keyword = document.getElementById('searchInput').value.trim();
+        const loadingEl = document.getElementById('loading');
+        const container = document.getElementById('resultContainer');
+        
+        loadingEl.style.display = 'block';
+        container.innerHTML = '';
 
-        async function main() {
-            try {
-                // 替換成你的 LINE LIFF ID
-                await liff.init({ liffId: "taiwansuckble" });
-                
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                } else {
-                    const profile = await liff.getProfile();
-                    document.getElementById('user-greeting').innerText = `歡迎回來，${profile.displayName}`;
-                    
-                    // 向 Google 試算表請求該使用者的分級與累計金額
-                    const res = await fetch(`${API_URL}?action=customer&userId=${profile.userId}`);
-                    const customer = await res.json();
-                    
-                    currentUserTier = customer.tier;
-                    document.getElementById('user-tier-info').innerHTML = 
-                        `客戶等級：<span class="badge tier-${customer.tier}">${customer.tier} 級</span> | 年累計消費：$${Number(customer.totalSpent).toLocaleString()}`;
-                }
-            } catch (error) {
-                document.getElementById('user-greeting').innerText = "系統連線異常";
-                console.error(error);
-            }
-        }
-
-        main();
-
-        async function searchBearing() {
-            const keyword = document.getElementById('keyword').value.trim();
-            const resultDiv = document.getElementById('result');
+        try {
+            const response = await fetch(`${GAS_URL}?q=${encodeURIComponent(keyword)}`);
+            const result = await response.json();
             
-            if(!keyword) {
-                alert('請輸入型號');
-                return;
+            loadingEl.style.display = 'none';
+            
+            if (result.status === "success") {
+                renderTable(result.data);
+            } else {
+                container.innerHTML = `<p class="error">錯誤: ${result.message || '未知錯誤'}</p>`;
             }
-
-            resultDiv.innerHTML = "<p>搜尋中...</p>";
-
-            try {
-                const res = await fetch(`${API_URL}?action=search&keyword=${encodeURIComponent(keyword)}`);
-                const items = await res.json();
-
-                if (items.length === 0) {
-                    resultDiv.innerHTML = "<p>找不到符合的軸承型號。</p>";
-                    return;
-                }
-
-                let html = '';
-                items.forEach(item => {
-                    // 根據客戶等級計算折扣價 (示範：S級 8折, A級 85折, B級 9折, C級 原價)
-                    let discount = 1.0;
-                    if (currentUserTier === 'S') discount = 0.8;
-                    else if (currentUserTier === 'A') discount = 0.85;
-                    else if (currentUserTier === 'B') discount = 0.9;
-
-                    const finalPrice = Math.round(item.price * discount);
-
-                    html += `
-                        <div class="card">
-
-                        const GAS_URL = "您的_GAS_網頁應用程式網址_exec";
-
-async function searchInventory(keyword = "") {
-    const loadingEl = document.getElementById('loading');
-    const resultContainer = document.getElementById('results');
-    
-    loadingEl.style.display = 'block';
-    resultContainer.innerHTML = '';
-
-    try {
-        let response = await fetch(`${GAS_URL}?q=${encodeURIComponent(keyword)}`);
-        let json = await response.json();
-        
-        loadingEl.style.display = 'none';
-        
-        if(json.status === "success") {
-            renderTable(json.data);
-        } else {
-            resultContainer.innerHTML = `<p style="color:red;">載入失敗</p>`;
+        } catch (err) {
+            loadingEl.style.display = 'none';
+            container.innerHTML = `<p class="error">連線失敗，請檢查 GAS 網址是否正確或尚未重新部署。</p>`;
+            console.error(err);
         }
-    } catch (err) {
-        loadingEl.style.display = 'none';
-        resultContainer.innerHTML = `<p style="color:red;">系統連線異常，請檢查網路或 API 網址</p>`;
     }
-}
 
-function renderTable(items) {
-    const container = document.getElementById('results');
-    if (items.length === 0) {
-        container.innerHTML = `<p>找不到相關軸承資料。</p>`;
-        return;
-    }
-    
-    let html = `<table border="1" style="width:100%; border-collapse: collapse;">
-                    <tr><th>產品編號</th><th>品名規格</th><th>庫存量</th></tr>`;
-    items.forEach(item => {
-        html += `<tr><td>${item.partNo}</td><td>${item.desc}</td><td>${item.stock}</td></tr>`;
-    });
-    html += `</table>`;
-    container.innerHTML = html;
-}
-
-// 頁面剛打開時，可以先帶入空字串撈前 100 筆，或改為等使用者輸入再查
-window.onload = function() {
-    searchInventory(""); 
-};
-                            <h3 style="margin-top:0;">型號：${item.model}</h3>
-                            <p>規格：${item.specs}</p>
-                            <p><b>現貨庫存：</b> <span style="color:red; font-size:18px;">${item.stock} 個</span></p>
-                            <p><b>牌價：</b> <del>$${item.price}</del></p>
-                            <p><b>您的專屬價 (${currentUserTier}級優惠)：</b> <span style="color:#06c755; font-size:20px; font-weight:bold;">$${finalPrice} /個</span></p>
-                        </div>
-                    `;
-                });
-                resultDiv.innerHTML = html;
-
-            } catch (error) {
-                resultDiv.innerHTML = "<p>查詢失敗，請稍後再試。</p>";
-                console.error(error);
-            }
+    function renderTable(items) {
+        const container = document.getElementById('resultContainer');
+        if (!items || items.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:#666;">找不到符合的庫存資料。</p>`;
+            return;
         }
-    </script>
+
+        let html = `<table>
+                        <tr>
+                            <th>產品編號</th>
+                            <th>品名規格</th>
+                            <th>庫存量</th>
+                        </tr>`;
+        
+        items.forEach(item => {
+            html += `<tr>
+                        <td>${item.partNo || ''}</td>
+                        <td>${item.desc || ''}</td>
+                        <td>${item.stock || ''}</td>
+                     </tr>`;
+        });
+        
+        html += `</table>`;
+        container.innerHTML = html;
+    }
+
+    // 頁面載入時自動執行預設查詢（帶入空字串，顯示前 100 筆）
+    window.onload = function() {
+        handleSearch();
+    };
+</script>
 </body>
 </html>
