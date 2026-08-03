@@ -44,6 +44,35 @@
         container.innerHTML = '';
 
         try {
+            async function handleSearch() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    const loadingEl = document.getElementById('loading');
+    const container = document.getElementById('resultContainer');
+    
+    loadingEl.style.display = 'block';
+    container.innerHTML = '';
+
+    try {
+        // 加上 redirect: 'follow' 確保 Google 重新導向不被中斷
+        const response = await fetch(`${GAS_URL}?q=${encodeURIComponent(keyword)}`, {
+            method: 'GET',
+            redirect: 'follow'
+        });
+        
+        const result = await response.json();
+        loadingEl.style.display = 'none';
+        
+        if (result.status === "success") {
+            renderTable(result.data);
+        } else {
+            container.innerHTML = `<p class="error">伺服器回報錯誤: ${result.message || '未知錯誤'}</p>`;
+        }
+    } catch (err) {
+        loadingEl.style.display = 'none';
+        container.innerHTML = `<p class="error">連線失敗！請檢查：1. GAS 網址是否正確 2. 是否已點擊「建立新版本」部署 3. 專案是否有設為「任何人」存取。</p>`;
+        console.error("詳細錯誤:", err);
+    }
+}
             const response = await fetch(`${GAS_URL}?q=${encodeURIComponent(keyword)}`);
             const result = await response.json();
             
