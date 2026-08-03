@@ -3,53 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>軸承庫存與價格查詢</title>
-    <!-- 1. 引入 LINE LIFF SDK -->
+    <title>軸承即時查詢與分級系統</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f5f5f5; }
-        .search-box { margin-bottom: 20px; }
-        input { padding: 10px; width: 70%; font-size: 16px; }
-        button { padding: 10px 15px; font-size: 16px; background-color: #06c755; color: white; border: none; }
+        body { font-family: sans-serif; padding: 20px; background-color: #f5f5f5; color: #333; }
+        .header { background: #06c755; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .search-box { margin-bottom: 20px; display: flex; gap: 10px; }
+        input { padding: 10px; flex: 1; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; font-size: 16px; background-color: #06c755; color: white; border: none; border-radius: 4px; cursor: pointer; }
         .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; color: white; }
+        .tier-S { background-color: #ff4757; }
+        .tier-A { background-color: #ffa502; }
+        .tier-B { background-color: #2ed573; }
+        .tier-C { background-color: #747d8c; }
     </style>
 </head>
 <body>
 
-    <h2>軸承即時查詢系統</h2>
-    <p id="user-info">載入中，正在確認您的會員身分...</p>
+    <div class="header">
+        <h3 id="user-greeting">載入中...</h3>
+        <p id="user-tier-info" style="margin: 5px 0 0 0; font-size: 14px;"></p>
+    </div>
 
     <div class="search-box">
-        <input type="text" id="keyword" placeholder="請輸入軸承型號（例如：32015）">
+        <input type="text" id="keyword" placeholder="輸入軸承型號（例如：32015）">
         <button onclick="searchBearing()">查詢</button>
     </div>
 
     <div id="result"></div>
 
     <script>
-        // 2. 初始化 LIFF
+        // 替換成你的 Google Apps Script 網頁應用程式網址
+        const API_URL = "https://script.google.com/macros/s/AKfycbyLkDA97xit5BFbtyHizO8oKll82tg3ISb0aiEh7tDMiBrV1v-vFMzpFvfJ74xyxM5B/exec"; 
+        let currentUserTier = 'C'; // 預設C級
+
         async function main() {
             try {
-                // 請把下面這行字換成你在 LINE Developers 後台拿到真正的 LIFF ID
-                await liff.init({ liffId: "你的LIFF_ID" });
+                // 替換成你的 LINE LIFF ID
+                await liff.init({ liffId: "taiwansuckble" });
                 
                 if (!liff.isLoggedIn()) {
-                    liff.login(); // 如果沒登入就導向 LINE 登入
+                    liff.login();
                 } else {
                     const profile = await liff.getProfile();
-                    // 抓到使用者的 LINE 名字與 ID
-                    document.getElementById('user-info').innerText = `歡迎，${profile.displayName} (您的身分已連動)`;
+                    document.getElementById('user-greeting').innerText = `歡迎回來，${profile.displayName}`;
+                    
+                    // 向 Google 試算表請求該使用者的分級與累計金額
+                    const res = await fetch(`${API_URL}?action=customer&userId=${profile.userId}`);
+                    const customer = await res.json();
+                    
+                    currentUserTier = customer.tier;
+                    document.getElementById('user-tier-info').innerHTML = 
+                        `客戶等級：<span class="badge tier-${customer.tier}">${customer.tier} 級</span> | 年累計消費：$${Number(customer.totalSpent).toLocaleString()}`;
                 }
             } catch (error) {
-                document.getElementById('user-info').innerText = "LIFF 初始化失敗：" + error;
+                document.getElementById('user-greeting').innerText = "系統連線異常";
+                console.error(error);
             }
         }
 
         main();
 
-        // 3. 模擬查詢按鈕點擊後的動作
-        function searchBearing() {
-            const keyword = document.getElementById('keyword').value;
+        async function searchBearing() {
+            const keyword = document.getElementById('keyword').value.trim();
             const resultDiv = document.getElementById('result');
             
             if(!keyword) {
@@ -57,16 +74,43 @@
                 return;
             }
 
-            // 這裡未來可以改為跟你的後端資料庫要資料
-            // 目前先用假資料示範
-            resultDiv.innerHTML = `
-                <div class="card">
-                    <h3>型號：${keyword}</h3>
-                    <p>規格：標準工業用</p>
-                    <p><b>庫存數量：</b> <span style="color:red; font-size:18px;">15 個</span></p>
-                    <p><b>您的專屬價 (S級優惠)：</b> <span style="color:blue; font-size:18px;">$1,200 /個</span></p>
-                </div>
-            `;
+            resultDiv.innerHTML = "<p>搜尋中...</p>";
+
+            try {
+                const res = await fetch(`${API_URL}?action=search&keyword=${encodeURIComponent(keyword)}`);
+                const items = await res.json();
+
+                if (items.length === 0) {
+                    resultDiv.innerHTML = "<p>找不到符合的軸承型號。</p>";
+                    return;
+                }
+
+                let html = '';
+                items.forEach(item => {
+                    // 根據客戶等級計算折扣價 (示範：S級 8折, A級 85折, B級 9折, C級 原價)
+                    let discount = 1.0;
+                    if (currentUserTier === 'S') discount = 0.8;
+                    else if (currentUserTier === 'A') discount = 0.85;
+                    else if (currentUserTier === 'B') discount = 0.9;
+
+                    const finalPrice = Math.round(item.price * discount);
+
+                    html += `
+                        <div class="card">
+                            <h3 style="margin-top:0;">型號：${item.model}</h3>
+                            <p>規格：${item.specs}</p>
+                            <p><b>現貨庫存：</b> <span style="color:red; font-size:18px;">${item.stock} 個</span></p>
+                            <p><b>牌價：</b> <del>$${item.price}</del></p>
+                            <p><b>您的專屬價 (${currentUserTier}級優惠)：</b> <span style="color:#06c755; font-size:20px; font-weight:bold;">$${finalPrice} /個</span></p>
+                        </div>
+                    `;
+                });
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                resultDiv.innerHTML = "<p>查詢失敗，請稍後再試。</p>";
+                console.error(error);
+            }
         }
     </script>
 </body>
