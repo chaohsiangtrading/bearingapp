@@ -131,9 +131,9 @@
         #loading {
             text-align: center;
             padding: 30px;
-            color: var(--text-secondary);
-            display: none;
+            color: #f39c12;
             font-family: monospace;
+            font-weight: bold;
         }
 
         /* 數據表格區域 (高對比工業表格) */
@@ -242,23 +242,23 @@
     <!-- 搜尋與分類控制台 -->
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或關鍵字 (例: 6205)..." oninput="onSearchInput()">
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或關鍵字 (例: 63309)..." oninput="onSearchInput()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
         <!-- 快捷分類標籤 -->
         <div class="quick-tags">
-            <span class="tag active" onclick="quickSearch('')">全部型號</span>
-            <span class="tag" onclick="quickSearch('60')">60系列</span>
-            <span class="tag" onclick="quickSearch('62')">62系列</span>
-            <span class="tag" onclick="quickSearch('63')">63系列</span>
-            <span class="tag" onclick="quickSearch('UC')">UC座式</span>
-            <span class="tag" onclick="quickSearch('SKF')">SKF</span>
-            <span class="tag" onclick="quickSearch('NSK')">NSK</span>
+            <span class="tag active" onclick="quickSearch('', event)">全部型號</span>
+            <span class="tag" onclick="quickSearch('60', event)">60系列</span>
+            <span class="tag" onclick="quickSearch('62', event)">62系列</span>
+            <span class="tag" onclick="quickSearch('63', event)">63系列</span>
+            <span class="tag" onclick="quickSearch('UC', event)">UC座式</span>
+            <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
+            <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
         </div>
     </div>
 
     <!-- 載入中提示 -->
-    <div id="loading">載入中 もう少し待って...</div>
+    <div id="loading">正在連線載入 2 萬筆資料庫，請稍候...</div>
 
     <!-- 數據表格卡片 -->
     <div class="table-card">
@@ -292,65 +292,96 @@
         查詢清單
     </a>
     <a href="#" class="footer-item">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192 z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
         系統資訊
     </a>
 </footer>
 
 <script>
-    // ⚠️ 請確保此處為您最新部署的 GAS 網址
+    // ⚠️ 確保此處為您最新部署的 GAS 網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
 
+    let allData = [];
     let debounceTimer;
 
-    function onSearchInput() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            handleSearch();
-        }, 300);
-    }
-
-    function quickSearch(keyword) {
-        document.getElementById('searchInput').value = keyword;
-        // 切換標籤 active 樣式
-        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        handleSearch();
-    }
-
-    async function handleSearch() {
-        const keyword = document.getElementById('searchInput').value.trim();
+    // 1. 網頁背景初始化：一次性將整包 2 萬筆資料拉入瀏覽器記憶體
+    async function initDB() {
         const loadingEl = document.getElementById('loading');
         const tableEl = document.getElementById('resultTable');
-        const tbodyEl = document.getElementById('resultBody');
         
-        loadingEl.style.display = 'block';
-        tableEl.style.display = 'none';
-        tbodyEl.innerHTML = '';
-
         try {
-            const response = await fetch(`${GAS_URL}?q=${encodeURIComponent(keyword)}`, {
-                method: 'GET',
-                redirect: 'follow'
-            });
-            
+            const response = await fetch(GAS_URL, { method: 'GET', redirect: 'follow' });
             const result = await response.json();
-            loadingEl.style.display = 'none';
-            tableEl.style.display = 'table';
             
             if (result.status === "success") {
-                renderTable(result.data);
+                allData = result.data;
+                loadingEl.style.display = 'none';
+                tableEl.style.display = 'table';
+                document.getElementById('searchInput').disabled = false;
+                loadingEl.innerText = `資料庫載入完成！共 ${allData.length} 筆，已啟用零延遲前端即時過濾。`;
+                
+                // 預設顯示前 50 筆
+                renderTable(allData.slice(0, 50));
             } else {
-                tbodyEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#E31B23; padding: 20px;">錯誤: ${result.message || '未知錯誤'}</td></tr>`;
+                loadingEl.innerText = `載入錯誤: ${result.message || '未知錯誤'}`;
+                loadingEl.style.color = '#E31B23';
             }
         } catch (err) {
-            loadingEl.style.display = 'none';
-            tableEl.style.display = 'table';
-            tbodyEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#E31B23; padding: 20px;">連線失敗，請檢查 GAS 部署或網址。</td></tr>`;
+            loadingEl.innerText = "連線失敗，請檢查 GAS 部署或網址。";
+            loadingEl.style.color = '#E31B23';
             console.error(err);
         }
     }
 
+    // 2. 防抖輸入搜尋
+    function onSearchInput() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            handleSearch();
+        }, 200); // 縮短至 200ms 提高打字靈敏度
+    }
+
+    // 3. 點擊快捷分類標籤
+    function quickSearch(keyword, event) {
+        document.getElementById('searchInput').value = keyword;
+        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+        if (event && event.target) {
+            event.target.classList.add('active');
+        }
+        handleSearch();
+    }
+
+    // 4. 強效字串清洗引擎：自動轉小寫、清除所有空格、橫線、斜線、底線、點 (徹底解決 63309 找不到的問題)
+    function cleanStr(str) {
+        return String(str || "").toLowerCase().replace(/[\s\-\/\_\.]/g, "");
+    }
+
+    // 5. Mix 版前端毫秒級記憶體過濾搜尋
+    function handleSearch() {
+        const rawQuery = document.getElementById('searchInput').value.trim();
+        const tableEl = document.getElementById('resultTable');
+        tableEl.style.display = 'table';
+
+        if (!rawQuery) {
+            renderTable(allData.slice(0, 50));
+            return;
+        }
+
+        const cleanQ = cleanStr(rawQuery);
+        const keywords = cleanQ.split(/\s+/).filter(Boolean);
+
+        // 在瀏覽器記憶體中直接篩選，速度達到毫秒級
+        const matched = allData.filter(item => {
+            const pClean = cleanStr(item.p);
+            const dClean = cleanStr(item.d);
+            
+            return keywords.every(kw => pClean.includes(kw) || dClean.includes(kw));
+        });
+
+        renderTable(matched.slice(0, 100)); // 限制最多渲染 100 筆確保頁面極度流暢
+    }
+
+    // 6. 渲染表格畫面
     function renderTable(items) {
         const tbodyEl = document.getElementById('resultBody');
         if (!items || items.length === 0) {
@@ -360,17 +391,20 @@
 
         let html = '';
         items.forEach(item => {
-            const stockVal = item.stock !== undefined && item.stock !== "" ? item.stock : 0;
+            const stockVal = item.s !== undefined && item.s !== "" ? item.s : 0;
             const isZero = Number(stockVal) <= 0;
             html += `<tr>
-                        <td class="td-partno">${item.partNo || ''}</td>
-                        <td class="td-desc">${item.desc || ''}</td>
+                        <td class="td-partno">${item.p || ''}</td>
+                        <td class="td-desc">${item.d || ''}</td>
                         <td style="text-align: right;"><span class="stock-badge ${isZero ? 'stock-zero' : ''}">${stockVal}</span></td>
                      </tr>`;
         });
         
         tbodyEl.innerHTML = html;
     }
+
+    // 頁面載入後自動啟動初始化
+    initDB();
 </script>
 </body>
 </html>
