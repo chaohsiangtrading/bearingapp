@@ -104,22 +104,23 @@
             background-color: #c5121a;
         }
 
-        /* 快捷分類標籤 (工業標籤) */
+        /* 快捷品牌分類標籤 */
         .quick-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             margin-top: 12px;
         }
         .tag {
             background-color: #111;
             color: var(--text-secondary);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             border: 1px solid var(--border-color);
             transition: all 0.2s;
+            font-weight: 500;
         }
         .tag:hover, .tag.active {
             background-color: var(--skf-dark-blue);
@@ -242,18 +243,23 @@
     <!-- 搜尋與分類控制台 -->
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或關鍵字 (例: 63309)..." oninput="onSearchInput()" disabled>
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或品牌 (例: SKF 63309)..." oninput="onSearchInput()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
-        <!-- 快捷分類標籤 -->
+        <!-- 品牌與全部型號快捷標籤 -->
         <div class="quick-tags">
             <span class="tag active" onclick="quickSearch('', event)">全部型號</span>
-            <span class="tag" onclick="quickSearch('60', event)">60系列</span>
-            <span class="tag" onclick="quickSearch('62', event)">62系列</span>
-            <span class="tag" onclick="quickSearch('63', event)">63系列</span>
-            <span class="tag" onclick="quickSearch('UC', event)">UC座式</span>
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
+            <span class="tag" onclick="quickSearch('FAG', event)">FAG</span>
             <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
+            <span class="tag" onclick="quickSearch('NTN', event)">NTN</span>
+            <span class="tag" onclick="quickSearch('KOYO', event)">KOYO</span>
+            <span class="tag" onclick="quickSearch('NMB', event)">NMB</span>
+            <span class="tag" onclick="quickSearch('EZO', event)">EZO</span>
+            <span class="tag" onclick="quickSearch('DODGE', event)">DODGE</span>
+            <span class="tag" onclick="quickSearch('TIMKEN', event)">TIMKEN</span>
+            <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
+            <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
         </div>
     </div>
 
@@ -292,7 +298,7 @@
         查詢清單
     </a>
     <a href="#" class="footer-item">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192 z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
         系統資訊
     </a>
 </footer>
@@ -304,7 +310,7 @@
     let allData = [];
     let debounceTimer;
 
-    // 1. 網頁背景初始化：一次性將整包 2 萬筆資料拉入瀏覽器記憶體
+    // 1. 網頁背景初始化：一次性將整包資料拉入瀏覽器記憶體
     async function initDB() {
         const loadingEl = document.getElementById('loading');
         const tableEl = document.getElementById('resultTable');
@@ -338,10 +344,10 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             handleSearch();
-        }, 200); // 縮短至 200ms 提高打字靈敏度
+        }, 200);
     }
 
-    // 3. 點擊快捷分類標籤
+    // 3. 點擊品牌分類標籤
     function quickSearch(keyword, event) {
         document.getElementById('searchInput').value = keyword;
         document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
@@ -351,7 +357,7 @@
         handleSearch();
     }
 
-    // 4. 強效字串清洗引擎：自動轉小寫、清除所有空格、橫線、斜線、底線、點 (徹底解決 63309 找不到的問題)
+    // 4. 強效字串清洗引擎
     function cleanStr(str) {
         return String(str || "").toLowerCase().replace(/[\s\-\/\_\.]/g, "");
     }
