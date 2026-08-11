@@ -29,7 +29,7 @@
         .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; cursor: pointer; }
 
         /* 橫向滑動標籤 */
-        .quick-tags { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-top: 15px; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .quick-tags { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-top: 15px; padding-bottom: 5px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .quick-tags::-webkit-scrollbar { display: none; }
         .tag { background-color: #111; color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); white-space: nowrap; transition: 0.2s; }
         .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
@@ -51,6 +51,19 @@
 
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 9999; animation: fadeInOut 2s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* 底部導航欄 */
+        .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; }
+        .footer-item.active { color: var(--skf-red); }
+        .footer-icon { width: 22px; height: 22px; fill: currentColor; }
+
+        /* 系統資訊彈窗 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .modal-title { font-size: 16px; font-weight: bold; color: var(--skf-red); margin-bottom: 10px; }
+        .modal-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
+        .modal-btn { background: var(--skf-dark-blue); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -66,7 +79,8 @@
             <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="handleSearch()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
-        <div class="quick-tags">
+        <!-- 品牌標籤 -->
+        <div class="quick-tags" id="tagContainer">
             <span class="tag active" onclick="quickSearch('', event)">全部</span>
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
             <span class="tag" onclick="quickSearch('FAG', event)">FAG</span>
@@ -88,6 +102,35 @@
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
+<!-- 底部導航欄 (已賦予互動功能) -->
+<footer class="app-footer">
+    <button class="footer-item active" onclick="footerNav('home', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
+        型錄首頁
+    </button>
+    <button class="footer-item" onclick="footerNav('tags', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M341.333333 128A213.333333 213.333333 0 0 0 128 341.333333v68.266667h213.333333v-68.266667a85.333333 85.333333 0 0 1 85.333334-85.333333h213.333333a85.333333 85.333333 0 0 1 85.333333 85.333333v68.266667h213.333334v-68.266667a213.333333 213.333333 0 0 0-213.333334-213.333333H341.333333z" fill="currentColor"></path></svg>
+        快速分類
+    </button>
+    <button class="footer-item" onclick="footerNav('stock', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
+        查詢清單
+    </button>
+    <button class="footer-item" onclick="footerNav('info', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
+        系統資訊
+    </button>
+</footer>
+
+<!-- 系統資訊彈窗 -->
+<div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
+    <div class="modal-card">
+        <div class="modal-title">⚡ 軸受図書館 系統資訊</div>
+        <div class="modal-text" id="modalText">正在載入系統狀態...</div>
+        <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'">關閉</button>
+    </div>
+</div>
+
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
     let allData = [];
@@ -99,7 +142,7 @@
             allData = resData.data;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('searchInput').disabled = false;
-            renderTable(allData.slice(0, 50));
+            renderTable(allData.slice(0, 15));
         } catch (e) { console.error(e); }
     }
 
@@ -110,14 +153,51 @@
             if (inStockOnly && Number(item.s || 0) <= 0) return false;
             return item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query);
         });
-        renderTable(filtered.slice(0, 100));
+        renderTable(filtered.slice(0, 15));
     }
 
     function quickSearch(kw, e) {
         document.getElementById('searchInput').value = kw;
         document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-        e.target.classList.add('active');
+        if(e && e.target) e.target.classList.add('active');
         handleSearch();
+    }
+
+    // 底部導航按鈕互動邏輯
+    function footerNav(action, el) {
+        // 切換 active 樣式
+        document.querySelectorAll('.footer-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        if (action === 'home') {
+            // 重置首頁狀態
+            document.getElementById('searchInput').value = '';
+            document.getElementById('inStockOnly').checked = false;
+            const tags = document.querySelectorAll('.tag');
+            tags.forEach(t => t.classList.remove('active'));
+            tags[0].classList.add('active'); // 預設選中「全部」
+            renderTable(allData.slice(0, 15));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (action === 'tags') {
+            // 捲動到品牌標籤區塊
+            document.getElementById('tagContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (action === 'stock') {
+            // 切換至僅顯示有現貨
+            document.getElementById('inStockOnly').checked = true;
+            handleSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (action === 'info') {
+            // 顯示系統資訊彈窗
+            const modalText = document.getElementById('modalText');
+            modalText.innerHTML = `資料庫總筆數：<b>${allData.length}</b> 筆<br>運作狀態：<b>連線正常 (Online)</b><br>版本：PRO CATALOG v2.4`;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+    }
+
+    function closeModal(e) {
+        if (e.target.id === 'infoModal') {
+            document.getElementById('infoModal').style.display = 'none';
+        }
     }
 
     function copyToClipboard(text) {
