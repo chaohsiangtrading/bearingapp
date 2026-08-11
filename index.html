@@ -16,64 +16,39 @@
             --border-color: #323842;
         }
         * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-industrial);
-            color: var(--text-main);
-            padding-bottom: 70px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background-color: var(--bg-industrial); color: var(--text-main); padding-bottom: 70px; }
 
-        .app-header {
-            background-color: var(--skf-dark-blue);
-            color: white;
-            height: 55px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-            border-bottom: 3px solid var(--skf-red);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .app-header { background-color: var(--skf-dark-blue); color: white; height: 55px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 3px solid var(--skf-red); position: sticky; top: 0; z-index: 100; }
         .header-title { font-size: 18px; font-weight: bold; letter-spacing: 1.5px; }
         .header-badge { background-color: var(--skf-red); color: white; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         
         .container { max-width: 650px; margin: 15px auto; padding: 0 12px; }
-
-        .search-section { background-color: var(--card-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 15px; }
+        .search-section { background-color: var(--card-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px; }
         .search-bar { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 4px; overflow: hidden; background-color: #111; }
         .search-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 16px; outline: none; }
-        .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; cursor: pointer; }
 
         .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-        .tag { background-color: #111; color: var(--text-secondary); padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); font-weight: 500; }
-        .tag:hover, .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
+        .tag { background-color: #111; color: var(--text-secondary); padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); }
+        .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
 
-        .filter-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; align-items: center; }
-        .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: var(--text-main); }
+        .filter-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 13px; }
         .checkbox-label input { accent-color: var(--skf-red); width: 16px; height: 16px; margin-right: 8px; }
-
-        #loading { text-align: center; padding: 30px; color: #f39c12; font-family: monospace; font-weight: bold; }
 
         .table-card { background-color: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; }
         .result-table { width: 100%; border-collapse: collapse; }
-        .result-table th { background-color: #1a222d; color: var(--text-secondary); font-size: 13px; text-align: left; padding: 12px 15px; border-bottom: 2px solid var(--skf-red); }
         .result-table td { padding: 14px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
         
-        .td-partno { font-weight: bold; color: #61b0ff; font-family: monospace; font-size: 15px; cursor: pointer; transition: 0.2s; padding: 8px; border-radius: 4px; }
-        .td-partno:hover { background-color: rgba(97, 176, 255, 0.1); color: #fff; }
+        .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; padding: 8px; border-radius: 4px; }
+        .td-partno:hover { background-color: rgba(97, 176, 255, 0.1); }
         
-        .stock-badge { display: inline-block; background-color: rgba(0, 150, 0, 0.15); color: #4cd964; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 13px; border: 1px solid rgba(76, 217, 100, 0.3); }
+        .stock-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 13px; border: 1px solid; }
         .stock-zero { background-color: rgba(227, 27, 35, 0.15); color: var(--skf-red); border-color: rgba(227, 27, 35, 0.3); }
+        .stock-ok { background-color: rgba(0, 150, 0, 0.15); color: #4cd964; border-color: rgba(76, 217, 100, 0.3); }
 
-        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 1000; animation: fadeInOut 2s forwards; }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 9999; animation: fadeInOut 2s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
-
-        .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
-        .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; }
     </style>
 </head>
 <body>
@@ -86,34 +61,21 @@
 <div class="container">
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="onSearchInput()" disabled>
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="handleSearch()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
         <div class="quick-tags">
-            <span class="tag active" onclick="quickSearch('', event)">全部型號</span>
+            <span class="tag active" onclick="quickSearch('', event)">全部</span>
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
             <span class="tag" onclick="quickSearch('FAG', event)">FAG</span>
             <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
-            <span class="tag" onclick="quickSearch('NTN', event)">NTN</span>
-            <span class="tag" onclick="quickSearch('KOYO', event)">KOYO</span>
         </div>
         <div class="filter-controls">
-            <label class="checkbox-label">
-                <input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨
-            </label>
+            <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
         </div>
     </div>
-
-    <div id="loading">正在連線資料庫...</div>
-
-    <div class="table-card">
-        <table id="resultTable" class="result-table" style="display: none;">
-            <thead>
-                <tr><th>產品型號</th><th>規格說明</th><th style="text-align: right;">庫存</th></tr>
-            </thead>
-            <tbody id="resultBody"></tbody>
-        </table>
-    </div>
+    <div id="loading" style="text-align:center; padding:20px;">正在連線資料庫...</div>
+    <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
 <script>
@@ -122,48 +84,67 @@
 
     async function initDB() {
         try {
-            const response = await fetch(GAS_URL);
-            const result = await response.json();
-            if (result.status === "success") {
-                allData = result.data;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('resultTable').style.display = 'table';
-                document.getElementById('searchInput').disabled = false;
-                renderTable(allData.slice(0, 50));
-            }
-        } catch (err) { console.error(err); }
+            const res = await fetch(GAS_URL);
+            const resData = await res.json();
+            allData = resData.data;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('searchInput').disabled = false;
+            renderTable(allData.slice(0, 50));
+        } catch (e) { console.error(e); }
     }
-
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = `已複製: ${text}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-        });
-    }
-
-    function onSearchInput() { handleSearch(); }
 
     function handleSearch() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         const inStockOnly = document.getElementById('inStockOnly').checked;
-        const matched = allData.filter(item => {
-            const stock = Number(item.s || 0);
-            if (inStockOnly && stock <= 0) return false;
+        const filtered = allData.filter(item => {
+            if (inStockOnly && Number(item.s || 0) <= 0) return false;
             return item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query);
         });
-        renderTable(matched.slice(0, 100));
+        renderTable(filtered.slice(0, 100));
+    }
+
+    function quickSearch(kw, e) {
+        document.getElementById('searchInput').value = kw;
+        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        handleSearch();
+    }
+
+    function copyToClipboard(text) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => showToast(text)).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        document.body.removeChild(area);
+        showToast(text);
+    }
+
+    function showToast(text) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = `已複製: ${text}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
     }
 
     function renderTable(items) {
-        const tbody = document.getElementById('resultBody');
-        tbody.innerHTML = items.map(item => `
+        document.getElementById('resultBody').innerHTML = items.map(item => `
             <tr>
                 <td class="td-partno" onclick="copyToClipboard('${item.p}')">${item.p}</td>
                 <td>${item.d}</td>
-                <td style="text-align: right;"><span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : ''}">${item.s || 0}</span></td>
+                <td style="text-align: right;"><span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : 'stock-ok'}">${item.s || 0}</span></td>
             </tr>
         `).join('');
     }
