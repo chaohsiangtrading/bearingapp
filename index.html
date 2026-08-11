@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>軸受の製藥</title>
+    
+    <!-- PWA / iOS 支援設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="軸受図書館">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/002B49/FFFFFF?text=BEARING">
+
     <style>
         :root {
             --skf-dark-blue: #002B49;
@@ -23,10 +30,16 @@
         .header-badge { background-color: var(--skf-red); color: white; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         
         .container { max-width: 650px; margin: 15px auto; padding: 0 12px; }
-        .search-section { background-color: var(--card-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px; }
-        .search-bar { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 4px; overflow: hidden; background-color: #111; }
+        .search-section { background-color: var(--card-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px; position: relative; }
+        
+        .search-bar { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 4px; overflow: hidden; background-color: #111; position: relative; }
         .search-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 16px; outline: none; }
         .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; cursor: pointer; }
+
+        /* Auto-complete 下拉提示清單 */
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background-color: #1a1f29; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px; z-index: 50; max-height: 200px; overflow-y: auto; display: none; }
+        .autocomplete-item { padding: 10px 15px; font-size: 14px; color: var(--text-main); cursor: pointer; border-bottom: 1px solid var(--border-color); }
+        .autocomplete-item:hover, .autocomplete-item.highlight { background-color: rgba(97, 176, 255, 0.15); color: #61b0ff; }
 
         /* 橫向滑動標籤 */
         .quick-tags { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-top: 15px; padding-bottom: 5px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
@@ -70,15 +83,18 @@
 
 <header class="app-header">
     <div class="header-title">⚡軸受図書館</div>
-    <div class="header-badge">PRO CATALOG</div>
+    <div class="header-badge">PWA PRO</div>
 </header>
 
 <div class="container">
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="handleSearch()" disabled>
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="handleInput()" autocomplete="off" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
+            <!-- Auto-complete 提示清單容器 -->
+            <div id="autocompleteList" class="autocomplete-list"></div>
         </div>
+        
         <!-- 品牌標籤 -->
         <div class="quick-tags" id="tagContainer">
             <span class="tag active" onclick="quickSearch('', event)">全部</span>
@@ -94,6 +110,7 @@
             <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
             <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
         </div>
+        
         <div class="filter-controls">
             <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
         </div>
@@ -102,7 +119,7 @@
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
-<!-- 底部導航欄 (已賦予互動功能) -->
+<!-- 底部導航欄 -->
 <footer class="app-footer">
     <button class="footer-item active" onclick="footerNav('home', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
@@ -125,7 +142,7 @@
 <!-- 系統資訊彈窗 -->
 <div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
     <div class="modal-card">
-        <div class="modal-title">⚡ 軸受図書館 系統資訊</div>
+        <div class="modal-title">⚡ 軸受図書館 PWA</div>
         <div class="modal-text" id="modalText">正在載入系統狀態...</div>
         <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'">關閉</button>
     </div>
@@ -146,6 +163,47 @@
         } catch (e) { console.error(e); }
     }
 
+    // 輸入時觸發：同時更新查詢與自動完成下拉提示
+    function handleInput() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const listEl = document.getElementById('autocompleteList');
+        
+        handleSearch(); // 即時篩選下方表格
+
+        if (!query) {
+            listEl.style.display = 'none';
+            return;
+        }
+
+        // 尋找符合的前 5 個型號建議
+        const matches = allData.filter(item => item.p.toLowerCase().includes(query)).slice(0, 5);
+
+        if (matches.length > 0) {
+            listEl.innerHTML = matches.map(item => `
+                <div class="autocomplete-item" onclick="selectSuggestion('${item.p}')">
+                    <b>${item.p}</b> <span style="color:var(--text-secondary); font-size:12px;">(${item.d})</span>
+                </div>
+            `).join('');
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    // 點擊建議清單項目
+    function selectSuggestion(partNo) {
+        document.getElementById('searchInput').value = partNo;
+        document.getElementById('autocompleteList').style.display = 'none';
+        handleSearch();
+    }
+
+    // 點擊其他地方關閉下拉選單
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-bar')) {
+            document.getElementById('autocompleteList').style.display = 'none';
+        }
+    });
+
     function handleSearch() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         const inStockOnly = document.getElementById('inStockOnly').checked;
@@ -158,38 +216,34 @@
 
     function quickSearch(kw, e) {
         document.getElementById('searchInput').value = kw;
+        document.getElementById('autocompleteList').style.display = 'none';
         document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
         if(e && e.target) e.target.classList.add('active');
         handleSearch();
     }
 
-    // 底部導航按鈕互動邏輯
     function footerNav(action, el) {
-        // 切換 active 樣式
         document.querySelectorAll('.footer-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
 
         if (action === 'home') {
-            // 重置首頁狀態
             document.getElementById('searchInput').value = '';
             document.getElementById('inStockOnly').checked = false;
+            document.getElementById('autocompleteList').style.display = 'none';
             const tags = document.querySelectorAll('.tag');
             tags.forEach(t => t.classList.remove('active'));
-            tags[0].classList.add('active'); // 預設選中「全部」
+            tags[0].classList.add('active');
             renderTable(allData.slice(0, 15));
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'tags') {
-            // 捲動到品牌標籤區塊
             document.getElementById('tagContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else if (action === 'stock') {
-            // 切換至僅顯示有現貨
             document.getElementById('inStockOnly').checked = true;
             handleSearch();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'info') {
-            // 顯示系統資訊彈窗
             const modalText = document.getElementById('modalText');
-            modalText.innerHTML = `資料庫總筆數：<b>${allData.length}</b> 筆<br>運作狀態：<b>連線正常 (Online)</b><br>版本：PRO CATALOG v2.4`;
+            modalText.innerHTML = `資料庫總筆數：<b>${allData.length}</b> 筆<br>運作狀態：<b>PWA 線上運作中</b><br>版本：PWA PRO v3.0`;
             document.getElementById('infoModal').style.display = 'flex';
         }
     }
