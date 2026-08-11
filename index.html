@@ -28,11 +28,13 @@
         .search-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 16px; outline: none; }
         .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; cursor: pointer; }
 
-        .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-        .tag { background-color: #111; color: var(--text-secondary); padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); }
+        /* 橫向滑動標籤 */
+        .quick-tags { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-top: 15px; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .quick-tags::-webkit-scrollbar { display: none; }
+        .tag { background-color: #111; color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); white-space: nowrap; transition: 0.2s; }
         .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
 
-        .filter-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .filter-controls { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color); }
         .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 13px; }
         .checkbox-label input { accent-color: var(--skf-red); width: 16px; height: 16px; margin-right: 8px; }
 
@@ -40,7 +42,7 @@
         .result-table { width: 100%; border-collapse: collapse; }
         .result-table td { padding: 14px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
         
-        .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; padding: 8px; border-radius: 4px; }
+        .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; padding: 8px; border-radius: 4px; transition: 0.2s; }
         .td-partno:hover { background-color: rgba(97, 176, 255, 0.1); }
         
         .stock-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 13px; border: 1px solid; }
@@ -69,6 +71,14 @@
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
             <span class="tag" onclick="quickSearch('FAG', event)">FAG</span>
             <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
+            <span class="tag" onclick="quickSearch('NTN', event)">NTN</span>
+            <span class="tag" onclick="quickSearch('KOYO', event)">KOYO</span>
+            <span class="tag" onclick="quickSearch('NMB', event)">NMB</span>
+            <span class="tag" onclick="quickSearch('EZO', event)">EZO</span>
+            <span class="tag" onclick="quickSearch('DODGE', event)">DODGE</span>
+            <span class="tag" onclick="quickSearch('TIMKEN', event)">TIMKEN</span>
+            <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
+            <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
         </div>
         <div class="filter-controls">
             <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
