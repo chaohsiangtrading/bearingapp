@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>軸受の製藥</title>
     <style>
-        /* SKF 經典工業風配色定義 */
         :root {
-            --skf-dark-blue: #002B49;  /* SKF 深藍主色 */
-            --skf-black: #111111;      /* 工業黑 */
-            --skf-red: #E31B23;        /* 警示紅 */
-            --bg-industrial: #181c24;  /* 沉穩工業背景 */
-            --card-bg: #222831;        /* 卡片深色背景 */
-            --text-main: #f8f9fa;      /* 主文字色 */
-            --text-secondary: #9aa0a6; /* 次要文字色 */
-            --border-color: #323842;   /* 邊框線條色 */
+            --skf-dark-blue: #002B49;
+            --skf-black: #111111;
+            --skf-red: #E31B23;
+            --bg-industrial: #181c24;
+            --card-bg: #222831;
+            --text-main: #f8f9fa;
+            --text-secondary: #9aa0a6;
+            --border-color: #323842;
         }
         * { box-sizing: border-box; }
         body {
@@ -26,7 +25,6 @@
             padding-bottom: 70px;
         }
 
-        /* 頂部導航欄 (SKF 工業風) */
         .app-header {
             background-color: var(--skf-dark-blue);
             color: white;
@@ -40,263 +38,57 @@
             top: 0;
             z-index: 100;
         }
-        .header-title {
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-        }
-        .header-badge {
-            background-color: var(--skf-red);
-            color: white;
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        .header-title { font-size: 18px; font-weight: bold; letter-spacing: 1.5px; }
+        .header-badge { background-color: var(--skf-red); color: white; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        
+        .container { max-width: 650px; margin: 15px auto; padding: 0 12px; }
 
-        /* 容器 */
-        .container {
-            max-width: 650px;
-            margin: 15px auto;
-            padding: 0 12px;
-        }
+        .search-section { background-color: var(--card-bg); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 15px; }
+        .search-bar { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 4px; overflow: hidden; background-color: #111; }
+        .search-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 16px; outline: none; }
+        .search-btn { background-color: var(--skf-red); color: white; border: none; padding: 0 22px; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-        /* 搜尋卡片 (工業面板風) */
-        .search-section {
-            background-color: var(--card-bg);
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            margin-bottom: 15px;
-        }
-        .search-bar {
-            display: flex;
-            border: 2px solid var(--skf-dark-blue);
-            border-radius: 4px;
-            overflow: hidden;
-            background-color: #111;
-        }
-        .search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            color: #fff;
-            padding: 12px 15px;
-            font-size: 16px;
-            outline: none;
-        }
-        .search-input::placeholder {
-            color: var(--text-secondary);
-        }
-        .search-btn {
-            background-color: var(--skf-red);
-            color: white;
-            border: none;
-            padding: 0 22px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .search-btn:hover {
-            background-color: #c5121a;
-        }
+        .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+        .tag { background-color: #111; color: var(--text-secondary); padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); font-weight: 500; }
+        .tag:hover, .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
 
-        /* 品牌分類標籤 */
-        .quick-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-        }
-        .tag {
-            background-color: #111;
-            color: var(--text-secondary);
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .tag:hover, .tag.active {
-            background-color: var(--skf-dark-blue);
-            color: #fff;
-            border-color: var(--skf-red);
-        }
+        .filter-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; align-items: center; }
+        .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: var(--text-main); }
+        .checkbox-label input { accent-color: var(--skf-red); width: 16px; height: 16px; margin-right: 8px; }
 
-        /* 過濾控制列 (獨立勾選框) */
-        .filter-controls {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 13px;
-            color: var(--text-main);
-            user-select: none;
-        }
-        .checkbox-label input {
-            accent-color: var(--skf-red);
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            cursor: pointer;
-        }
+        #loading { text-align: center; padding: 30px; color: #f39c12; font-family: monospace; font-weight: bold; }
 
-        /* 載入提示 */
-        #loading {
-            text-align: center;
-            padding: 30px;
-            color: #f39c12;
-            font-family: monospace;
-            font-weight: bold;
-        }
+        .table-card { background-color: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; }
+        .result-table { width: 100%; border-collapse: collapse; }
+        .result-table th { background-color: #1a222d; color: var(--text-secondary); font-size: 13px; text-align: left; padding: 12px 15px; border-bottom: 2px solid var(--skf-red); }
+        .result-table td { padding: 14px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        
+        .td-partno { font-weight: bold; color: #61b0ff; font-family: monospace; font-size: 15px; cursor: pointer; transition: 0.2s; padding: 8px; border-radius: 4px; }
+        .td-partno:hover { background-color: rgba(97, 176, 255, 0.1); color: #fff; }
+        
+        .stock-badge { display: inline-block; background-color: rgba(0, 150, 0, 0.15); color: #4cd964; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 13px; border: 1px solid rgba(76, 217, 100, 0.3); }
+        .stock-zero { background-color: rgba(227, 27, 35, 0.15); color: var(--skf-red); border-color: rgba(227, 27, 35, 0.3); }
 
-        /* 數據表格區域 (高對比工業表格) */
-        .table-card {
-            background-color: var(--card-bg);
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .result-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .result-table th {
-            background-color: #1a222d;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 13px;
-            text-align: left;
-            padding: 12px 15px;
-            border-bottom: 2px solid var(--skf-red);
-            letter-spacing: 0.5px;
-        }
-        .result-table td {
-            padding: 14px 15px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            vertical-align: middle;
-        }
-        .result-table tr:hover {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-        /* 點擊複製的交互樣式 */
-.td-partno {
-    font-weight: bold;
-    color: #61b0ff;
-    font-family: monospace;
-    font-size: 15px;
-    cursor: pointer; /* 顯示為手指指標 */
-    transition: all 0.2s;
-    padding: 8px;
-    border-radius: 4px;
-}
-.td-partno:hover {
-    background-color: rgba(97, 176, 255, 0.1);
-    color: #fff;
-}
-/* 複製成功的提示樣式 */
-.toast {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #4cd964;
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: bold;
-    z-index: 1000;
-    animation: fadeInOut 2s forwards;
-}
-@keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
-        }
-        .td-desc {
-            color: var(--text-main);
-            line-height: 1.4;
-        }
-        .stock-badge {
-            display: inline-block;
-            background-color: rgba(0, 150, 0, 0.15);
-            color: #4cd964;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 13px;
-            border: 1px solid rgba(76, 217, 100, 0.3);
-        }
-        .stock-zero {
-            background-color: rgba(227, 27, 35, 0.15);
-            color: var(--skf-red);
-            border-color: rgba(227, 27, 35, 0.3);
-        }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 1000; animation: fadeInOut 2s forwards; }
+        @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 
-        /* 底部導航欄 (工業沈穩風) */
-        .app-footer {
-            background-color: var(--skf-black);
-            height: 60px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 650px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-        }
-        .footer-item {
-            text-decoration: none;
-            color: var(--text-secondary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            gap: 3px;
-            flex: 1;
-            transition: color 0.2s;
-        }
-        .footer-item.active {
-            color: var(--skf-red);
-        }
-        .footer-icon {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
+        .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; }
     </style>
 </head>
 <body>
 
-<!-- 頂部導航欄 (SKF 風格) -->
 <header class="app-header">
     <div class="header-title">⚡軸受図書館</div>
     <div class="header-badge">PRO CATALOG</div>
 </header>
 
 <div class="container">
-    <!-- 搜尋與分類控制台 -->
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或品牌 (例: SKF 63309)..." oninput="onSearchInput()" disabled>
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="onSearchInput()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
-        
-        <!-- 品牌與全部型號快捷標籤 -->
         <div class="quick-tags">
             <span class="tag active" onclick="quickSearch('', event)">全部型號</span>
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
@@ -304,177 +96,78 @@
             <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
             <span class="tag" onclick="quickSearch('NTN', event)">NTN</span>
             <span class="tag" onclick="quickSearch('KOYO', event)">KOYO</span>
-            <span class="tag" onclick="quickSearch('NMB', event)">NMB</span>
-            <span class="tag" onclick="quickSearch('EZO', event)">EZO</span>
-            <span class="tag" onclick="quickSearch('DODGE', event)">DODGE</span>
-            <span class="tag" onclick="quickSearch('TIMKEN', event)">TIMKEN</span>
-            <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
-            <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
         </div>
-
-        <!-- 獨立勾選框過濾列 -->
         <div class="filter-controls">
             <label class="checkbox-label">
-                <input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨 (排除庫存 0)
+                <input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨
             </label>
         </div>
     </div>
 
-    <!-- 載入中提示 -->
-    <div id="loading">正在連線載入 2 萬筆資料庫，請稍候...</div>
+    <div id="loading">正在連線資料庫...</div>
 
-    <!-- 數據表格卡片 -->
     <div class="table-card">
         <table id="resultTable" class="result-table" style="display: none;">
             <thead>
-                <tr>
-                    <th style="width: 35%;">產品型號</th>
-                    <th style="width: 45%;">規格說明</th>
-                    <th style="width: 20%; text-align: right;">即時庫存</th>
-                </tr>
+                <tr><th>產品型號</th><th>規格說明</th><th style="text-align: right;">庫存</th></tr>
             </thead>
-            <tbody id="resultBody">
-                <!-- 動態資料注入 -->
-            </tbody>
+            <tbody id="resultBody"></tbody>
         </table>
     </div>
 </div>
 
-<!-- 底部導航欄 -->
-<footer class="app-footer">
-    <a href="#" class="footer-item active">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
-        型錄首頁
-    </a>
-    <a href="#" class="footer-item">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M341.333333 128A213.333333 213.333333 0 0 0 128 341.333333v68.266667h213.333333v-68.266667a85.333333 85.333333 0 0 1 85.333334-85.333333h213.333333a85.333333 85.333333 0 0 1 85.333333 85.333333v68.266667h213.333334v-68.266667a213.333333 213.333333 0 0 0-213.333334-213.333333H341.333333z" fill="currentColor"></path></svg>
-        快速分類
-    </a>
-    <a href="#" class="footer-item">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
-        查詢清單
-    </a>
-    <a href="#" class="footer-item">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
-        系統資訊
-    </a>
-</footer>
-
 <script>
-    // ⚠️ 確保此處為您最新部署的 GAS 網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
-
     let allData = [];
-    let debounceTimer;
 
-    // 1. 網頁背景初始化：一次性將整包資料拉入瀏覽器記憶體
     async function initDB() {
-        const loadingEl = document.getElementById('loading');
-        const tableEl = document.getElementById('resultTable');
-        
         try {
-            const response = await fetch(GAS_URL, { method: 'GET', redirect: 'follow' });
+            const response = await fetch(GAS_URL);
             const result = await response.json();
-            
             if (result.status === "success") {
                 allData = result.data;
-                loadingEl.style.display = 'none';
-                tableEl.style.display = 'table';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultTable').style.display = 'table';
                 document.getElementById('searchInput').disabled = false;
-                loadingEl.innerText = `資料庫載入完成！共 ${allData.length} 筆，已啟用零延遲前端即時過濾。`;
-                
-                // 預設顯示前 50 筆
                 renderTable(allData.slice(0, 50));
-            } else {
-                loadingEl.innerText = `載入錯誤: ${result.message || '未知錯誤'}`;
-                loadingEl.style.color = '#E31B23';
             }
-        } catch (err) {
-            loadingEl.innerText = "連線失敗，請檢查 GAS 部署或網址。";
-            loadingEl.style.color = '#E31B23';
-            console.error(err);
-        }
+        } catch (err) { console.error(err); }
     }
 
-    // 2. 防抖輸入搜尋
-    function onSearchInput() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            handleSearch();
-        }, 200);
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = `已複製: ${text}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        });
     }
 
-    // 3. 點擊品牌分類標籤
-    function quickSearch(keyword, event) {
-        document.getElementById('searchInput').value = keyword;
-        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-        if (event && event.target) {
-            event.target.classList.add('active');
-        }
-        handleSearch();
-    }
+    function onSearchInput() { handleSearch(); }
 
-    // 4. 強效字串清洗引擎
-    function cleanStr(str) {
-        return String(str || "").toLowerCase().replace(/[\s\-\/\_\.]/g, "");
-    }
-
-    // 5. Mix 版前端毫秒級記憶體過濾搜尋 (含現貨過濾)
     function handleSearch() {
-        const rawQuery = document.getElementById('searchInput').value.trim();
+        const query = document.getElementById('searchInput').value.toLowerCase();
         const inStockOnly = document.getElementById('inStockOnly').checked;
-        const tableEl = document.getElementById('resultTable');
-        tableEl.style.display = 'table';
-
-        const cleanQ = cleanStr(rawQuery);
-        const keywords = cleanQ.split(/\s+/).filter(Boolean);
-
-        // 在瀏覽器記憶體中直接篩選
         const matched = allData.filter(item => {
-            const stockVal = Number(item.s !== undefined && item.s !== "" ? item.s : 0);
-            
-            // 如果勾選了「僅顯示有現貨」，先排除庫存 <= 0 的項目
-            if (inStockOnly && stockVal <= 0) {
-                return false;
-            }
-
-            // 如果沒有輸入關鍵字，且有勾選現貨，就直接回傳有現貨的項目
-            if (keywords.length === 0) {
-                return true;
-            }
-
-            const pClean = cleanStr(item.p);
-            const dClean = cleanStr(item.d);
-            
-            return keywords.every(kw => pClean.includes(kw) || dClean.includes(kw));
+            const stock = Number(item.s || 0);
+            if (inStockOnly && stock <= 0) return false;
+            return item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query);
         });
-
-        renderTable(matched.slice(0, 100)); // 限制最多渲染 100 筆確保頁面極度流暢
+        renderTable(matched.slice(0, 100));
     }
 
-    // 6. 渲染表格畫面
     function renderTable(items) {
-        const tbodyEl = document.getElementById('resultBody');
-        if (!items || items.length === 0) {
-            tbodyEl.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#9aa0a6; padding: 30px;">未檢索到符合的軸承庫存數據</td></tr>`;
-            return;
-        }
-
-        let html = '';
-        items.forEach(item => {
-            const stockVal = item.s !== undefined && item.s !== "" ? item.s : 0;
-            const isZero = Number(stockVal) <= 0;
-            html += `<tr>
-                        <td class="td-partno">${item.p || ''}</td>
-                        <td class="td-desc">${item.d || ''}</td>
-                        <td style="text-align: right;"><span class="stock-badge ${isZero ? 'stock-zero' : ''}">${stockVal}</span></td>
-                     </tr>`;
-        });
-        
-        tbodyEl.innerHTML = html;
+        const tbody = document.getElementById('resultBody');
+        tbody.innerHTML = items.map(item => `
+            <tr>
+                <td class="td-partno" onclick="copyToClipboard('${item.p}')">${item.p}</td>
+                <td>${item.d}</td>
+                <td style="text-align: right;"><span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : ''}">${item.s || 0}</span></td>
+            </tr>
+        `).join('');
     }
 
-    // 頁面載入後自動啟動初始化
     initDB();
 </script>
 </body>
