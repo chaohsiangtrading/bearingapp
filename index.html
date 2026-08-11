@@ -104,7 +104,7 @@
             background-color: #c5121a;
         }
 
-        /* 快捷品牌分類標籤 */
+        /* 品牌分類標籤 */
         .quick-tags {
             display: flex;
             flex-wrap: wrap;
@@ -126,6 +126,30 @@
             background-color: var(--skf-dark-blue);
             color: #fff;
             border-color: var(--skf-red);
+        }
+
+        /* 過濾控制列 (獨立勾選框) */
+        .filter-controls {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-main);
+            user-select: none;
+        }
+        .checkbox-label input {
+            accent-color: var(--skf-red);
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            cursor: pointer;
         }
 
         /* 載入提示 */
@@ -246,6 +270,7 @@
             <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號、品名或品牌 (例: SKF 63309)..." oninput="onSearchInput()" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
         </div>
+        
         <!-- 品牌與全部型號快捷標籤 -->
         <div class="quick-tags">
             <span class="tag active" onclick="quickSearch('', event)">全部型號</span>
@@ -260,6 +285,13 @@
             <span class="tag" onclick="quickSearch('TIMKEN', event)">TIMKEN</span>
             <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
             <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
+        </div>
+
+        <!-- 獨立勾選框過濾列 -->
+        <div class="filter-controls">
+            <label class="checkbox-label">
+                <input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨 (排除庫存 0)
+            </label>
         </div>
     </div>
 
@@ -362,22 +394,30 @@
         return String(str || "").toLowerCase().replace(/[\s\-\/\_\.]/g, "");
     }
 
-    // 5. Mix 版前端毫秒級記憶體過濾搜尋
+    // 5. Mix 版前端毫秒級記憶體過濾搜尋 (含現貨過濾)
     function handleSearch() {
         const rawQuery = document.getElementById('searchInput').value.trim();
+        const inStockOnly = document.getElementById('inStockOnly').checked;
         const tableEl = document.getElementById('resultTable');
         tableEl.style.display = 'table';
-
-        if (!rawQuery) {
-            renderTable(allData.slice(0, 50));
-            return;
-        }
 
         const cleanQ = cleanStr(rawQuery);
         const keywords = cleanQ.split(/\s+/).filter(Boolean);
 
-        // 在瀏覽器記憶體中直接篩選，速度達到毫秒級
+        // 在瀏覽器記憶體中直接篩選
         const matched = allData.filter(item => {
+            const stockVal = Number(item.s !== undefined && item.s !== "" ? item.s : 0);
+            
+            // 如果勾選了「僅顯示有現貨」，先排除庫存 <= 0 的項目
+            if (inStockOnly && stockVal <= 0) {
+                return false;
+            }
+
+            // 如果沒有輸入關鍵字，且有勾選現貨，就直接回傳有現貨的項目
+            if (keywords.length === 0) {
+                return true;
+            }
+
             const pClean = cleanStr(item.p);
             const dClean = cleanStr(item.d);
             
