@@ -192,11 +192,36 @@
         .result-table tr:hover {
             background-color: rgba(255, 255, 255, 0.02);
         }
-        .td-partno {
-            font-weight: bold;
-            color: #61b0ff;
-            font-family: monospace;
-            font-size: 15px;
+        /* 點擊複製的交互樣式 */
+.td-partno {
+    font-weight: bold;
+    color: #61b0ff;
+    font-family: monospace;
+    font-size: 15px;
+    cursor: pointer; /* 顯示為手指指標 */
+    transition: all 0.2s;
+    padding: 8px;
+    border-radius: 4px;
+}
+.td-partno:hover {
+    background-color: rgba(97, 176, 255, 0.1);
+    color: #fff;
+}
+/* 複製成功的提示樣式 */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4cd964;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 1000;
+    animation: fadeInOut 2s forwards;
+}
+@keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
         }
         .td-desc {
             color: var(--text-main);
