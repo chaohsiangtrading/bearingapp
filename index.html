@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>軸受の製藥</title>
+    <title>軸受図書館</title>
     
     <!-- PWA / iOS 支援設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -71,12 +71,44 @@
         .footer-item.active { color: var(--skf-red); }
         .footer-icon { width: 22px; height: 22px; fill: currentColor; }
 
-        /* 系統資訊彈窗 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .modal-title { font-size: 16px; font-weight: bold; color: var(--skf-red); margin-bottom: 10px; }
-        .modal-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
-        .modal-btn { background: var(--skf-dark-blue); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        /* 台灣化高級會員中心 Modal 樣式 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .member-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 88vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* 會員頂部紅黑漸層看板 */
+        .member-header-bg { background: linear-gradient(135deg, #8B0000 0%, #1a1a1a 100%); padding: 20px 15px 25px 15px; color: white; position: relative; }
+        .member-close-btn { position: absolute; right: 15px; top: 15px; background: rgba(0,0,0,0.3); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+        .member-info-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .member-avatar { width: 55px; height: 55px; background: #333; border-radius: 50%; border: 2px solid #ff4d4d; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
+        .member-details h2 { margin: 0 0 4px 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .member-level-tag { background: #ff4d4d; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+        .member-company { font-size: 13px; color: #d1d5db; margin: 0; }
+
+        .member-stats { display: flex; justify-content: space-around; text-align: center; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px; }
+        .stat-num { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 2px; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); }
+
+        /* VIP 卡片宣傳條 */
+        .vip-card-banner { margin: -10px 15px 15px 15px; background: linear-gradient(90deg, #2c2c2c 0%, #3a3a3a 100%); border: 1px solid #d4af37; border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #f3e5ab; }
+        .vip-title { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .vip-btn { background: #d4af37; color: #111; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* 區塊容器 */
+        .member-section { background: var(--card-bg); margin: 0 15px 15px 15px; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+        .section-header { padding: 12px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; color: var(--text-main); }
+        .section-header span { font-size: 12px; color: var(--text-secondary); font-weight: normal; cursor: pointer; }
+
+        /* 訂單九宮格列 */
+        .order-status-grid { display: flex; justify-content: space-around; padding: 15px 10px; text-align: center; }
+        .order-status-item { background: none; border: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+        .order-status-item svg { width: 22px; height: 22px; fill: #61b0ff; }
+
+        /* 功能選單列表 */
+        .menu-list-item { padding: 14px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-main); border-bottom: 1px solid var(--border-color); cursor: pointer; background: none; width: 100%; border-left: none; border-right: none; border-top: none; text-align: left; }
+        .menu-list-item:last-child { border-bottom: none; }
+        .menu-list-item:hover { background-color: rgba(255,255,255,0.03); }
+        .menu-arrow { color: var(--text-secondary); font-size: 12px; }
     </style>
 </head>
 <body>
@@ -86,16 +118,14 @@
     <div class="header-badge">PWA PRO</div>
 </header>
 
-<div class="container">
+<div class="container" id="mainContainer">
     <div class="search-section">
         <div class="search-bar">
             <input type="text" id="searchInput" class="search-input" placeholder="輸入軸承型號..." oninput="handleInput()" autocomplete="off" disabled>
             <button class="search-btn" onclick="handleSearch()">搜尋</button>
-            <!-- Auto-complete 提示清單容器 -->
             <div id="autocompleteList" class="autocomplete-list"></div>
         </div>
         
-        <!-- 品牌標籤 -->
         <div class="quick-tags" id="tagContainer">
             <span class="tag active" onclick="quickSearch('', event)">全部</span>
             <span class="tag" onclick="quickSearch('SKF', event)">SKF</span>
@@ -135,16 +165,92 @@
     </button>
     <button class="footer-item" onclick="footerNav('info', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
-        系統資訊
+        會員中心
     </button>
 </footer>
 
-<!-- 系統資訊彈窗 -->
-<div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
-    <div class="modal-card">
-        <div class="modal-title">⚡ 軸受図書館 PWA</div>
-        <div class="modal-text" id="modalText">正在載入系統狀態...</div>
-        <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'">關閉</button>
+<!-- 台灣化高級會員中心 Modal -->
+<div class="modal-overlay" id="memberModal" onclick="closeModal(event)">
+    <div class="member-container">
+        <!-- 頂部卡片區 -->
+        <div class="member-header-bg">
+            <button class="member-close-btn" onclick="toggleMemberModal(false)">✕</button>
+            <div class="member-info-row">
+                <div class="member-avatar">軸</div>
+                <div class="member-details">
+                    <h2>兆翔貿易 <span class="member-level-tag">C級經銷</span></h2>
+                    <p class="member-company">帳號 ID: 977266524</p>
+                </div>
+            </div>
+            <div class="member-stats">
+                <div>
+                    <div class="stat-num">$0</div>
+                    <div class="stat-label">帳戶餘額</div>
+                </div>
+                <div>
+                    <div class="stat-num">0 張</div>
+                    <div class="stat-label">可用折價券</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIP 優惠卡片 -->
+        <div class="vip-card-banner">
+            <div class="vip-title">👑 VIP 企業採購年卡 <span style="font-size:11px; font-weight:normal; color:#d1d5db;">享專屬折扣與優先備貨</span></div>
+            <button class="vip-btn" onclick="alert('請聯繫業務經理升級 VIP 權限')">立即開通</button>
+        </div>
+
+        <!-- 我的訂單區塊 -->
+        <div class="member-section">
+            <div class="section-header">我的訂單 <span onclick="alert('顯示全部訂單')">全部訂單 ›</span></div>
+            <div class="order-status-grid">
+                <button class="order-status-item" onclick="alert('無待確認庫存訂單')">
+                    <svg viewBox="0 0 1024 1024"><path d="M853.333333 213.333333H170.666667a85.333333 85.333333 0 0 0-85.333334 85.333334v426.666666a85.333333 85.333333 0 0 0 85.333334 85.333334h682.666666a85.333333 85.333333 0 0 0 85.333334-85.333334V298.666667a85.333333 85.333333 0 0 0-85.333334-85.333334z" fill="currentColor"/></svg>
+                    待確認庫存
+                </button>
+                <button class="order-status-item" onclick="alert('無待付款訂單')">
+                    <svg viewBox="0 0 1024 1024"><path d="M885.333333 213.333333H138.666667C94.293333 213.333333 64 243.626667 64 288v448c0 44.373333 30.293333 74.666667 74.666667 74.666667h746.666666c44.373333 0 74.666667-30.293333 74.666667-74.666667V288c0-44.373333-30.293333-74.666667-74.666667-74.666667z" fill="currentColor"/></svg>
+                    待付款
+                </button>
+                <button class="order-status-item" onclick="alert('尚無待出貨訂單')">
+                    <svg viewBox="0 0 1024 1024"><path d="M938.666667 341.333333H725.333333V213.333333H85.333333v512h640V576h213.333334L938.666667 341.333333z" fill="currentColor"/></svg>
+                    待出貨
+                </button>
+                <button class="order-status-item" onclick="alert('尚無待收貨訂單')">
+                    <svg viewBox="0 0 1024 1024"><path d="M960 554.666667L810.666667 341.333333H682.666667V170.666667a42.666667 42.666667 0 0 0-42.666667-42.666667H85.333333a42.666667 42.666667 0 0 0-42.666666 42.666667v682.666666a42.666667 42.666667 0 0 0 42.666666 42.666667h554.666667a42.666667 42.666667 0 0 0 42.666667-42.666667V640h128l149.333333 192v-277.333333z" fill="currentColor"/></svg>
+                    待收貨
+                </button>
+            </div>
+        </div>
+
+        <!-- 常用捷徑 -->
+        <div class="member-section">
+            <button class="menu-list-item" onclick="alert('瀏覽紀錄功能建構中')">
+                <span>⏱ 瀏覽歷史紀錄</span> <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-list-item" onclick="alert('我的收藏清單建構中')">
+                <span>⭐ 我的收藏軸承</span> <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-list-item" onclick="alert('收件地址管理建構中')">
+                <span>📍 收件與物流地址</span> <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-list-item" onclick="showSystemInfo()">
+                <span>📊 資料庫狀態與版本</span> <span class="menu-arrow">›</span>
+            </button>
+        </div>
+
+        <!-- 設定與公司資訊 -->
+        <div class="member-section" style="margin-bottom: 30px;">
+            <button class="menu-list-item" onclick="alert('請聯絡管理員綁定帳號')">
+                <span>🔒 帳號安全與綁定</span> <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-list-item" onclick="alert('目前統編：5300xxxx (如需修改請洽業務)')">
+                <span>🧾 公司統編與發票資訊</span> <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-list-item" onclick="alert('客服專線：07-XXXXXXX')">
+                <span>☎️ 線上客服與幫助中心</span> <span class="menu-arrow">›</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -163,19 +269,16 @@
         } catch (e) { console.error(e); }
     }
 
-    // 輸入時觸發：同時更新查詢與自動完成下拉提示
     function handleInput() {
         const query = document.getElementById('searchInput').value.trim().toLowerCase();
         const listEl = document.getElementById('autocompleteList');
-        
-        handleSearch(); // 即時篩選下方表格
+        handleSearch();
 
         if (!query) {
             listEl.style.display = 'none';
             return;
         }
 
-        // 尋找符合的前 5 個型號建議
         const matches = allData.filter(item => item.p.toLowerCase().includes(query)).slice(0, 5);
 
         if (matches.length > 0) {
@@ -190,14 +293,12 @@
         }
     }
 
-    // 點擊建議清單項目
     function selectSuggestion(partNo) {
         document.getElementById('searchInput').value = partNo;
         document.getElementById('autocompleteList').style.display = 'none';
         handleSearch();
     }
 
-    // 點擊其他地方關閉下拉選單
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-bar')) {
             document.getElementById('autocompleteList').style.display = 'none';
@@ -242,16 +343,22 @@
             handleSearch();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'info') {
-            const modalText = document.getElementById('modalText');
-            modalText.innerHTML = `資料庫總筆數：<b>${allData.length}</b> 筆<br>運作狀態：<b>PWA 線上運作中</b><br>版本：PWA PRO v3.0`;
-            document.getElementById('infoModal').style.display = 'flex';
+            toggleMemberModal(true);
         }
     }
 
+    function toggleMemberModal(show) {
+        document.getElementById('memberModal').style.display = show ? 'flex' : 'none';
+    }
+
     function closeModal(e) {
-        if (e.target.id === 'infoModal') {
-            document.getElementById('infoModal').style.display = 'none';
+        if (e.target.id === 'memberModal') {
+            toggleMemberModal(false);
         }
+    }
+
+    function showSystemInfo() {
+        alert(`資料庫總筆數：${allData.length} 筆\n運行狀態：PWA 正常連線\n版本：PWA 台灣PRO v3.2`);
     }
 
     function copyToClipboard(text) {
