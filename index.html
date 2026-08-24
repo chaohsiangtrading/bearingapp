@@ -80,7 +80,7 @@
         .price-header-title { font-size: 16px; font-weight: bold; color: #fff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
-        /* 品牌切換按鈕列 (目前先設 3 種品牌，後續可補) */
+        /* 品牌切換列 (KOYO, FAG, SKF) */
         .brand-tab-bar { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .brand-tab { background: #111; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .brand-tab.active { background: var(--skf-red); color: white; border-color: var(--skf-red); }
@@ -170,10 +170,10 @@
             <button class="price-close-btn" onclick="toggleModal('priceModal', false)">✕</button>
         </div>
 
-        <!-- 品牌切換列 (目前 3 種品牌，後續可擴充) -->
+        <!-- 品牌切換列 (KOYO, FAG, SKF) -->
         <div class="brand-tab-bar" id="brandTabBar">
             <button class="brand-tab active" onclick="switchBrand('KOYO')">KOYO 品牌</button>
-            <button class="brand-tab" onclick="switchBrand('NSK')">NSK 品牌</button>
+            <button class="brand-tab" onclick="switchBrand('FAG')">FAG 品牌</button>
             <button class="brand-tab" onclick="switchBrand('SKF')">SKF 品牌</button>
         </div>
 
@@ -181,7 +181,7 @@
         <div class="price-control-panel">
             <div class="custom-discount-row">
                 <label for="customDiscountInput">⚙️ 自訂折數（例如輸入 74 或 0.74）：</label>
-                <input type="number" id="customDiscountInput" class="discount-input" value="35" placeholder="例: 74" oninput="handlePriceSearch()">
+                <input type="number" id="customDiscountInput" class="discount-input" value="74" placeholder="例: 74" oninput="handlePriceSearch()">
             </div>
             <div class="price-input-wrapper">
                 <input type="text" id="priceSearchInput" class="price-input" placeholder="輸入型號關鍵字..." oninput="handlePriceSearch()">
@@ -228,7 +228,7 @@
     let allData = [];
     let currentSelectedBrand = 'KOYO';
 
-    // 先建立三種品牌資料庫（後續您可以隨時補上其他品牌）
+    // KOYO、FAG、SKF 三大品牌牌價資料庫
     const brandPriceDB = {
         'KOYO': [
             { p: '6205ZZ', d: '深溝滾珠軸承', listPrice: 450 },
@@ -236,10 +236,10 @@
             { p: '32015AV', d: '圓錐滾子軸承', listPrice: 2400 },
             { p: '6308ZZ', d: '深溝滾珠軸承', listPrice: 1150 }
         ],
-        'NSK': [
-            { p: '6205ZZ', d: '深溝滾珠軸承 (NSK)', listPrice: 480 },
-            { p: '6206ZZ', d: '深溝滾珠軸承 (NSK)', listPrice: 610 },
-            { p: '7305B', d: '接觸角球軸承', listPrice: 1450 }
+        'FAG': [
+            { p: '6205-2ZR', d: '深溝滾珠軸承 (FAG)', listPrice: 520 },
+            { p: '6206-2ZR', d: '深溝滾珠軸承 (FAG)', listPrice: 670 },
+            { p: '22210-E1', d: '自動調心滾子軸承', listPrice: 2800 }
         ],
         'SKF': [
             { p: '6205-2Z', d: 'Explorer 高效能軸承', listPrice: 650 },
@@ -364,9 +364,8 @@
     function renderPriceResults(items) {
         const container = document.getElementById('priceResultList');
         
-        // 取得使用者輸入的折數（支援 "74" 或 "0.74" 的輸入方式）
         let rawVal = parseFloat(document.getElementById('customDiscountInput').value);
-        let discountMultiplier = 0.35; // 預設防呆
+        let discountMultiplier = 0.74; // 預設防呆
         
         if (!isNaN(rawVal)) {
             if (rawVal > 1) {
