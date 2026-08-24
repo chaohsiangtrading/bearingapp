@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>軸受図書館</title>
+    <title>軸受図書館 - 牌價試算系統</title>
     
     <!-- PWA / iOS 支援設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,7 +39,7 @@
         /* Auto-complete 下拉提示清單 */
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background-color: #1a1f29; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px; z-index: 50; max-height: 200px; overflow-y: auto; display: none; }
         .autocomplete-item { padding: 10px 15px; font-size: 14px; color: var(--text-main); cursor: pointer; border-bottom: 1px solid var(--border-color); }
-        .autocomplete-item:hover, .autocomplete-item.highlight { background-color: rgba(97, 176, 255, 0.15); color: #61b0ff; }
+        .autocomplete-item:hover { background-color: rgba(97, 176, 255, 0.15); color: #61b0ff; }
 
         /* 橫向滑動標籤 */
         .quick-tags { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-top: 15px; padding-bottom: 5px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
@@ -71,44 +71,39 @@
         .footer-item.active { color: var(--skf-red); }
         .footer-icon { width: 22px; height: 22px; fill: currentColor; }
 
-        /* 台灣化高級會員中心 Modal 樣式 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
-        .member-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 88vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; }
+        /* 科技感牌價表彈窗 Modal 樣式 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .price-modal-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 90vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; border-top: 3px solid var(--skf-red); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* 會員頂部紅黑漸層看板 */
-        .member-header-bg { background: linear-gradient(135deg, #8B0000 0%, #1a1a1a 100%); padding: 20px 15px 25px 15px; color: white; position: relative; }
-        .member-close-btn { position: absolute; right: 15px; top: 15px; background: rgba(0,0,0,0.3); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; }
-        .member-info-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .member-avatar { width: 55px; height: 55px; background: #333; border-radius: 50%; border: 2px solid #ff4d4d; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
-        .member-details h2 { margin: 0 0 4px 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-        .member-level-tag { background: #ff4d4d; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
-        .member-company { font-size: 13px; color: #d1d5db; margin: 0; }
+        .price-header { background: linear-gradient(135deg, var(--skf-dark-blue) 0%, #111 100%); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
+        .price-header-title { font-size: 16px; font-weight: bold; color: #fff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
-        .member-stats { display: flex; justify-content: space-around; text-align: center; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px; }
-        .stat-num { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 2px; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); }
+        /* 品牌切換按鈕列 */
+        .brand-tab-bar { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .brand-tab { background: #111; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .brand-tab.active { background: var(--skf-red); color: white; border-color: var(--skf-red); }
 
-        /* VIP 卡片宣傳條 */
-        .vip-card-banner { margin: -10px 15px 15px 15px; background: linear-gradient(90deg, #2c2c2c 0%, #3a3a3a 100%); border: 1px solid #d4af37; border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #f3e5ab; }
-        .vip-title { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .vip-btn { background: #d4af37; color: #111; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        /* 牌價查詢搜尋框 */
+        .price-search-box { padding: 15px; background: var(--bg-industrial); }
+        .price-input-wrapper { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 6px; overflow: hidden; background: #111; }
+        .price-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 15px; outline: none; }
+        .price-input::placeholder { color: var(--text-secondary); font-size: 13px; }
+        .price-search-action { background: var(--skf-dark-blue); color: white; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
 
-        /* 區塊容器 */
-        .member-section { background: var(--card-bg); margin: 0 15px 15px 15px; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        .section-header { padding: 12px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; color: var(--text-main); }
-        .section-header span { font-size: 12px; color: var(--text-secondary); font-weight: normal; cursor: pointer; }
-
-        /* 訂單九宮格列 */
-        .order-status-grid { display: flex; justify-content: space-around; padding: 15px 10px; text-align: center; }
-        .order-status-item { background: none; border: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
-        .order-status-item svg { width: 22px; height: 22px; fill: #61b0ff; }
-
-        /* 功能選單列表 */
-        .menu-list-item { padding: 14px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-main); border-bottom: 1px solid var(--border-color); cursor: pointer; background: none; width: 100%; border-left: none; border-right: none; border-top: none; text-align: left; }
-        .menu-list-item:last-child { border-bottom: none; }
-        .menu-list-item:hover { background-color: rgba(255,255,255,0.03); }
-        .menu-arrow { color: var(--text-secondary); font-size: 12px; }
+        /* 牌價結果清單 */
+        .price-results-area { padding: 0 15px 20px 15px; }
+        .price-item-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .price-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #61b0ff; }
+        .price-info p { margin: 0; font-size: 12px; color: var(--text-secondary); }
+        .price-calc { text-align: right; }
+        .list-price { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
+        .final-price { font-size: 16px; font-weight: bold; color: #4cd964; }
+        .discount-tag { display: inline-block; background: rgba(227, 27, 35, 0.2); color: var(--skf-red); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
+        
+        .negotiate-btn { background: #2c323d; color: #f3e5ab; border: 1px solid #d4af37; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 6px; }
+        .negotiate-btn:hover { background: #d4af37; color: #111; }
     </style>
 </head>
 <body>
@@ -149,7 +144,7 @@
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
-<!-- 底部導航欄 -->
+<!-- 底部導航欄 (已改回各大品牌牌價) -->
 <footer class="app-footer">
     <button class="footer-item active" onclick="footerNav('home', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
@@ -159,97 +154,39 @@
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M341.333333 128A213.333333 213.333333 0 0 0 128 341.333333v68.266667h213.333333v-68.266667a85.333333 85.333333 0 0 1 85.333334-85.333333h213.333333a85.333333 85.333333 0 0 1 85.333333 85.333333v68.266667h213.333334v-68.266667a213.333333 213.333333 0 0 0-213.333334-213.333333H341.333333z" fill="currentColor"></path></svg>
         快速分類
     </button>
-    <button class="footer-item" onclick="footerNav('stock', this)">
+    <button class="footer-item" onclick="footerNav('price', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
-        查詢清單
-    </button>
-    <button class="footer-item" onclick="footerNav('info', this)">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192z m0 85.333333c-127.466667 0-384 64-384 192v85.333334h768v-85.333334c0-128-256.533333-192-384-192z" fill="currentColor"></path></svg>
-        會員中心
+        各大品牌牌價
     </button>
 </footer>
 
-<!-- 台灣化高級會員中心 Modal -->
-<div class="modal-overlay" id="memberModal" onclick="closeModal(event)">
-    <div class="member-container">
-        <!-- 頂部卡片區 -->
-        <div class="member-header-bg">
-            <button class="member-close-btn" onclick="toggleMemberModal(false)">✕</button>
-            <div class="member-info-row">
-                <div class="member-avatar">軸</div>
-                <div class="member-details">
-                    <h2>兆翔貿易 <span class="member-level-tag">C級經銷</span></h2>
-                    <p class="member-company">帳號 ID: 977266524</p>
-                </div>
-            </div>
-            <div class="member-stats">
-                <div>
-                    <div class="stat-num">$0</div>
-                    <div class="stat-label">帳戶餘額</div>
-                </div>
-                <div>
-                    <div class="stat-num">0 張</div>
-                    <div class="stat-label">可用折價券</div>
-                </div>
-            </div>
+<!-- 各大品牌牌價表彈窗 -->
+<div class="modal-overlay" id="priceModal" onclick="closePriceModal(event)">
+    <div class="price-modal-container">
+        <div class="price-header">
+            <div class="price-header-title">⚡ 各大品牌牌價與折數試算</div>
+            <button class="price-close-btn" onclick="togglePriceModal(false)">✕</button>
         </div>
 
-        <!-- VIP 優惠卡片 -->
-        <div class="vip-card-banner">
-            <div class="vip-title">👑 VIP 企業採購年卡 <span style="font-size:11px; font-weight:normal; color:#d1d5db;">享專屬折扣與優先備貨</span></div>
-            <button class="vip-btn" onclick="alert('請聯繫業務經理升級 VIP 權限')">立即開通</button>
+        <!-- 品牌切換列 -->
+        <div class="brand-tab-bar" id="brandTabBar">
+            <button class="brand-tab active" onclick="switchBrand('KOYO')">KOYO 台灣牌價</button>
+            <button class="brand-tab" onclick="switchBrand('FAG')">FAG 工業牌價</button>
+            <button class="brand-tab" onclick="switchBrand('SKF')">SKF 精品牌價</button>
+            <button class="brand-tab" onclick="switchBrand('ASAHI')">ASAHI 軸承座</button>
         </div>
 
-        <!-- 我的訂單區塊 -->
-        <div class="member-section">
-            <div class="section-header">我的訂單 <span onclick="alert('顯示全部訂單')">全部訂單 ›</span></div>
-            <div class="order-status-grid">
-                <button class="order-status-item" onclick="alert('無待確認庫存訂單')">
-                    <svg viewBox="0 0 1024 1024"><path d="M853.333333 213.333333H170.666667a85.333333 85.333333 0 0 0-85.333334 85.333334v426.666666a85.333333 85.333333 0 0 0 85.333334 85.333334h682.666666a85.333333 85.333333 0 0 0 85.333334-85.333334V298.666667a85.333333 85.333333 0 0 0-85.333334-85.333334z" fill="currentColor"/></svg>
-                    待確認庫存
-                </button>
-                <button class="order-status-item" onclick="alert('無待付款訂單')">
-                    <svg viewBox="0 0 1024 1024"><path d="M885.333333 213.333333H138.666667C94.293333 213.333333 64 243.626667 64 288v448c0 44.373333 30.293333 74.666667 74.666667 74.666667h746.666666c44.373333 0 74.666667-30.293333 74.666667-74.666667V288c0-44.373333-30.293333-74.666667-74.666667-74.666667z" fill="currentColor"/></svg>
-                    待付款
-                </button>
-                <button class="order-status-item" onclick="alert('尚無待出貨訂單')">
-                    <svg viewBox="0 0 1024 1024"><path d="M938.666667 341.333333H725.333333V213.333333H85.333333v512h640V576h213.333334L938.666667 341.333333z" fill="currentColor"/></svg>
-                    待出貨
-                </button>
-                <button class="order-status-item" onclick="alert('尚無待收貨訂單')">
-                    <svg viewBox="0 0 1024 1024"><path d="M960 554.666667L810.666667 341.333333H682.666667V170.666667a42.666667 42.666667 0 0 0-42.666667-42.666667H85.333333a42.666667 42.666667 0 0 0-42.666666 42.666667v682.666666a42.666667 42.666667 0 0 0 42.666666 42.666667h554.666667a42.666667 42.666667 0 0 0 42.666667-42.666667V640h128l149.333333 192v-277.333333z" fill="currentColor"/></svg>
-                    待收貨
-                </button>
+        <!-- 搜尋框 -->
+        <div class="price-search-box">
+            <div class="price-input-wrapper">
+                <input type="text" id="priceSearchInput" class="price-input" placeholder="請輸入 KOYO, NSK, FAG, NTN 等型號..." oninput="handlePriceSearch()">
+                <button class="price-search-action" onclick="handlePriceSearch()">試算</button>
             </div>
         </div>
 
-        <!-- 常用捷徑 -->
-        <div class="member-section">
-            <button class="menu-list-item" onclick="alert('瀏覽紀錄功能建構中')">
-                <span>⏱ 瀏覽歷史紀錄</span> <span class="menu-arrow">›</span>
-            </button>
-            <button class="menu-list-item" onclick="alert('我的收藏清單建構中')">
-                <span>⭐ 我的收藏軸承</span> <span class="menu-arrow">›</span>
-            </button>
-            <button class="menu-list-item" onclick="alert('收件地址管理建構中')">
-                <span>📍 收件與物流地址</span> <span class="menu-arrow">›</span>
-            </button>
-            <button class="menu-list-item" onclick="showSystemInfo()">
-                <span>📊 資料庫狀態與版本</span> <span class="menu-arrow">›</span>
-            </button>
-        </div>
-
-        <!-- 設定與公司資訊 -->
-        <div class="member-section" style="margin-bottom: 30px;">
-            <button class="menu-list-item" onclick="alert('請聯絡管理員綁定帳號')">
-                <span>🔒 帳號安全與綁定</span> <span class="menu-arrow">›</span>
-            </button>
-            <button class="menu-list-item" onclick="alert('目前統編：5300xxxx (如需修改請洽業務)')">
-                <span>🧾 公司統編與發票資訊</span> <span class="menu-arrow">›</span>
-            </button>
-            <button class="menu-list-item" onclick="alert('客服專線：07-XXXXXXX')">
-                <span>☎️ 線上客服與幫助中心</span> <span class="menu-arrow">›</span>
-            </button>
+        <!-- 結果顯示區 -->
+        <div class="price-results-area" id="priceResultList">
+            <!-- 動態產出 -->
         </div>
     </div>
 </div>
@@ -257,6 +194,32 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
     let allData = [];
+    let currentSelectedBrand = 'KOYO';
+
+    // 模擬各品牌的牌價資料庫與折數設定
+    const brandPriceDB = {
+        'KOYO': [
+            { p: '6205ZZ', d: '深溝滾珠軸承', listPrice: 450, discount: 0.35 },
+            { p: '6206ZZ', d: '深溝滾珠軸承', listPrice: 580, discount: 0.35 },
+            { p: '32015AV', d: '圓錐滾子軸承', listPrice: 2400, discount: 0.38 },
+            { p: '6308ZZ', d: '深溝滾珠軸承', listPrice: 1150, discount: 0.35 }
+        ],
+        'FAG': [
+            { p: '6205ZZ', d: '深溝滾珠軸承 (FAG)', listPrice: 520, discount: 0.32 },
+            { p: '63072RS', d: '膠蓋深溝滾珠', listPrice: 980, discount: 0.32 },
+            { p: '32015JV', d: '圓錐滾子軸承', listPrice: 2800, discount: 0.30 }
+        ],
+        'SKF': [
+            { p: '6205-2Z', d: 'Explorer 高效能軸承', listPrice: 650, discount: 0.30 },
+            { p: '6206-2Z', d: 'Explorer 高效能軸承', listPrice: 820, discount: 0.30 },
+            { p: 'NJ205ECP', d: '圓柱滾子軸承', listPrice: 1500, discount: 0.28 }
+        ],
+        'ASAHI': [
+            { p: 'UCP205', d: '立式軸承座', listPrice: 620, discount: 0.40 },
+            { p: 'UCP206', d: '立式軸承座', listPrice: 750, discount: 0.40 },
+            { p: 'UCF205', d: '方型四孔軸承座', listPrice: 680, discount: 0.40 }
+        ]
+    };
 
     async function initDB() {
         try {
@@ -338,27 +301,71 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'tags') {
             document.getElementById('tagContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (action === 'stock') {
-            document.getElementById('inStockOnly').checked = true;
-            handleSearch();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else if (action === 'info') {
-            toggleMemberModal(true);
+        } else if (action === 'price') {
+            togglePriceModal(true);
         }
     }
 
-    function toggleMemberModal(show) {
-        document.getElementById('memberModal').style.display = show ? 'flex' : 'none';
-    }
-
-    function closeModal(e) {
-        if (e.target.id === 'memberModal') {
-            toggleMemberModal(false);
+    // 牌價表 Modal 控制
+    function togglePriceModal(show) {
+        document.getElementById('priceModal').style.display = show ? 'flex' : 'none';
+        if (show) {
+            renderPriceResults(brandPriceDB[currentSelectedBrand]);
         }
     }
 
-    function showSystemInfo() {
-        alert(`資料庫總筆數：${allData.length} 筆\n運行狀態：PWA 正常連線\n版本：PWA 台灣PRO v3.2`);
+    function closePriceModal(e) {
+        if (e.target.id === 'priceModal') {
+            togglePriceModal(false);
+        }
+    }
+
+    // 切換品牌
+    function switchBrand(brandName) {
+        currentSelectedBrand = brandName;
+        document.querySelectorAll('.brand-tab').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('priceSearchInput').value = '';
+        renderPriceResults(brandPriceDB[currentSelectedBrand]);
+    }
+
+    // 牌價即時搜尋與試算
+    function handlePriceSearch() {
+        const query = document.getElementById('priceSearchInput').value.trim().toLowerCase();
+        const dataset = brandPriceDB[currentSelectedBrand] || [];
+        const filtered = dataset.filter(item => item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query));
+        renderPriceResults(filtered);
+    }
+
+    // 渲染牌價與自動計算折數結果
+    function renderPriceResults(items) {
+        const container = document.getElementById('priceResultList');
+        if (!items || items.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-secondary);">查無此 ${currentSelectedBrand} 品牌型號資料</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const finalPrice = Math.round(item.listPrice * item.discount);
+            const discountPercentage = Math.round(item.discount * 100);
+
+            return `
+                <div class="price-item-card">
+                    <div class="price-info">
+                        <h4 onclick="copyToClipboard('${item.p}')" style="cursor:pointer;" title="點擊複製">${item.p}</h4>
+                        <p>${item.d}</p>
+                        <button class="negotiate-btn" onclick="alert('已為您發起 [${currentSelectedBrand}] ${item.p} 量大議價詢問，將由專人聯繫！')">💬 量大議價</button>
+                    </div>
+                    <div class="price-calc">
+                        <div class="list-price">牌價 $${item.listPrice}</div>
+                        <div>
+                            <span class="final-price">$${finalPrice}</span>
+                            <span class="discount-tag">${discountPercentage}折</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     function copyToClipboard(text) {
