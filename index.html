@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>軸受図書館 - 牌價試算系統</title>
+    <title>軸受図書館 - 牌價與購物車系統</title>
     
     <!-- PWA / iOS 支援設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -65,13 +65,13 @@
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 9999; animation: fadeInOut 2s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 
-        /* 底部導航欄 (保留原樣式，移除品牌牌價按鈕) */
+        /* 底部導航欄 */
         .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
         .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; }
         .footer-item.active { color: var(--skf-red); }
         .footer-icon { width: 22px; height: 22px; fill: currentColor; }
 
-        /* 科技感牌價表彈窗 Modal 樣式 */
+        /* 牌價表與彈窗樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
         .price-modal-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 90vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; border-top: 3px solid var(--skf-red); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -80,20 +80,24 @@
         .price-header-title { font-size: 16px; font-weight: bold; color: #fff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
-        /* 品牌切換按鈕列 */
+        /* 品牌切換列 (KOYO, FAG, SKF) */
         .brand-tab-bar { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .brand-tab { background: #111; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .brand-tab.active { background: var(--skf-red); color: white; border-color: var(--skf-red); }
 
-        /* 牌價查詢搜尋框 */
-        .price-search-box { padding: 15px; background: var(--bg-industrial); }
+        /* 牌價上方設定區（含自訂折數輸入框） */
+        .price-control-panel { padding: 15px; background: var(--bg-industrial); display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .custom-discount-row { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .custom-discount-row label { font-size: 13px; color: var(--text-secondary); font-weight: bold; }
+        .discount-input { width: 80px; background: #111; border: 1px solid var(--skf-dark-blue); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 14px; text-align: center; outline: none; }
+        
         .price-input-wrapper { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 6px; overflow: hidden; background: #111; }
         .price-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 15px; outline: none; }
         .price-input::placeholder { color: var(--text-secondary); font-size: 13px; }
         .price-search-action { background: var(--skf-dark-blue); color: white; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
 
         /* 牌價結果清單 */
-        .price-results-area { padding: 0 15px 20px 15px; }
+        .price-results-area { padding: 15px; }
         .price-item-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .price-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #61b0ff; }
         .price-info p { margin: 0; font-size: 12px; color: var(--text-secondary); }
@@ -104,10 +108,6 @@
         
         .negotiate-btn { background: #2c323d; color: #f3e5ab; border: 1px solid #d4af37; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 6px; }
         .negotiate-btn:hover { background: #d4af37; color: #111; }
-
-        /* 將「查詢清單」改為可點擊的按鈕樣式 */
-        #navPriceGrid { cursor: pointer; transition: background-color 0.2s; }
-        #navPriceGrid:hover { background-color: rgba(227, 27, 35, 0.1); }
     </style>
 </head>
 <body>
@@ -132,10 +132,317 @@
             <span class="tag" onclick="quickSearch('NSK', event)">NSK</span>
             <span class="tag" onclick="quickSearch('NTN', event)">NTN</span>
             <span class="tag" onclick="quickSearch('KOYO', event)">KOYO</span>
-            <span class="tag" onclick="quickSearch('NMB', event)">NMB</span>
-            <span class="tag" onclick="quickSearch('EZO', event)">EZO</span>
-            <span class="tag" onclick="quickSearch('DODGE', event)">DODGE</span>
-            <span class="tag" onclick="quickSearch('TIMKEN', event)">TIMKEN</span>
-            <span class="tag" onclick="quickSearch('ASAHI', event)">ASAHI</span>
-            <span class="tag" onclick="quickSearch('FYH', event)">FYH</span>
         </div>
+        
+        <div class="filter-controls">
+            <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
+        </div>
+    </div>
+    <div id="loading" style="text-align:center; padding:20px;">正在連線資料庫...</div>
+    <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
+</div>
+
+<!-- 底部導航欄 -->
+<footer class="app-footer">
+    <button class="footer-item active" onclick="footerNav('home', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
+        型錄首頁
+    </button>
+    <button class="footer-item" onclick="footerNav('cart', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
+        購物車
+    </button>
+    <button class="footer-item" onclick="footerNav('price', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/></svg>
+        各大品牌牌價
+    </button>
+    <button class="footer-item" onclick="footerNav('profile', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192zm0 96c-128 0-384 64-384 192v64h768v-64c0-128-256-192-384-192z"/></svg>
+        個人資訊
+    </button>
+</footer>
+
+<!-- 各大品牌牌價表彈窗 -->
+<div class="modal-overlay" id="priceModal" onclick="closeModal(event, 'priceModal')">
+    <div class="price-modal-container">
+        <div class="price-header">
+            <div class="price-header-title">⚡ 各大品牌牌價與折數試算</div>
+            <button class="price-close-btn" onclick="toggleModal('priceModal', false)">✕</button>
+        </div>
+
+        <!-- 品牌切換列 (KOYO, FAG, SKF) -->
+        <div class="brand-tab-bar" id="brandTabBar">
+            <button class="brand-tab active" onclick="switchBrand('KOYO')">KOYO 品牌</button>
+            <button class="brand-tab" onclick="switchBrand('FAG')">FAG 品牌</button>
+            <button class="brand-tab" onclick="switchBrand('SKF')">SKF 品牌</button>
+        </div>
+
+        <!-- 牌價控制與自訂折數輸入面板 -->
+        <div class="price-control-panel">
+            <div class="custom-discount-row">
+                <label for="customDiscountInput">⚙️ 自訂折數（例如輸入 74 或 0.74）：</label>
+                <input type="number" id="customDiscountInput" class="discount-input" value="74" placeholder="例: 74" oninput="handlePriceSearch()">
+            </div>
+            <div class="price-input-wrapper">
+                <input type="text" id="priceSearchInput" class="price-input" placeholder="輸入型號關鍵字..." oninput="handlePriceSearch()">
+                <button class="price-search-action" onclick="handlePriceSearch()">搜尋</button>
+            </div>
+        </div>
+
+        <!-- 結果顯示區 -->
+        <div class="price-results-area" id="priceResultList"></div>
+    </div>
+</div>
+
+<!-- 購物車彈窗 -->
+<div class="modal-overlay" id="cartModal" onclick="closeModal(event, 'cartModal')">
+    <div class="price-modal-container">
+        <div class="price-header">
+            <div class="price-header-title">🛒 已選購清單 / 購物車</div>
+            <button class="price-close-btn" onclick="toggleModal('cartModal', false)">✕</button>
+        </div>
+        <div style="padding: 20px; color: var(--text-secondary); text-align: center;">
+            目前購物車尚無品項，請從型錄或牌價試算加入。
+        </div>
+    </div>
+</div>
+
+<!-- 個人資訊彈窗 -->
+<div class="modal-overlay" id="profileModal" onclick="closeModal(event, 'profileModal')">
+    <div class="price-modal-container">
+        <div class="price-header">
+            <div class="price-header-title">👤 個人資訊與設定</div>
+            <button class="price-close-btn" onclick="toggleModal('profileModal', false)">✕</button>
+        </div>
+        <div style="padding: 20px;">
+            <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff;">帳號狀態：VIP 業務經銷專用端</p>
+                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">地區：高雄營運中心</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
+    let allData = [];
+    let currentSelectedBrand = 'KOYO';
+
+    // KOYO、FAG、SKF 三大品牌牌價資料庫
+    const brandPriceDB = {
+        'KOYO': [
+            { p: '6205ZZ', d: '深溝滾珠軸承', listPrice: 450 },
+            { p: '6206ZZ', d: '深溝滾珠軸承', listPrice: 580 },
+            { p: '32015AV', d: '圓錐滾子軸承', listPrice: 2400 },
+            { p: '6308ZZ', d: '深溝滾珠軸承', listPrice: 1150 }
+        ],
+        'FAG': [
+            { p: '6205-2ZR', d: '深溝滾珠軸承 (FAG)', listPrice: 520 },
+            { p: '6206-2ZR', d: '深溝滾珠軸承 (FAG)', listPrice: 670 },
+            { p: '22210-E1', d: '自動調心滾子軸承', listPrice: 2800 }
+        ],
+        'SKF': [
+            { p: '6205-2Z', d: 'Explorer 高效能軸承', listPrice: 650 },
+            { p: '6206-2Z', d: 'Explorer 高效能軸承', listPrice: 820 },
+            { p: 'NJ205ECP', d: '圓柱滾子軸承', listPrice: 1500 }
+        ]
+    };
+
+    async function initDB() {
+        try {
+            const res = await fetch(GAS_URL);
+            const resData = await res.json();
+            allData = resData.data;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('searchInput').disabled = false;
+            renderTable(allData.slice(0, 15));
+        } catch (e) { console.error(e); }
+    }
+
+    function handleInput() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const listEl = document.getElementById('autocompleteList');
+        handleSearch();
+
+        if (!query) {
+            listEl.style.display = 'none';
+            return;
+        }
+
+        const matches = allData.filter(item => item.p.toLowerCase().includes(query)).slice(0, 5);
+
+        if (matches.length > 0) {
+            listEl.innerHTML = matches.map(item => `
+                <div class="autocomplete-item" onclick="selectSuggestion('${item.p}')">
+                    <b>${item.p}</b> <span style="color:var(--text-secondary); font-size:12px;">(${item.d})</span>
+                </div>
+            `).join('');
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    function selectSuggestion(partNo) {
+        document.getElementById('searchInput').value = partNo;
+        document.getElementById('autocompleteList').style.display = 'none';
+        handleSearch();
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-bar')) {
+            document.getElementById('autocompleteList').style.display = 'none';
+        }
+    });
+
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const inStockOnly = document.getElementById('inStockOnly').checked;
+        const filtered = allData.filter(item => {
+            if (inStockOnly && Number(item.s || 0) <= 0) return false;
+            return item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query);
+        });
+        renderTable(filtered.slice(0, 15));
+    }
+
+    function quickSearch(kw, e) {
+        document.getElementById('searchInput').value = kw;
+        document.getElementById('autocompleteList').style.display = 'none';
+        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+        if(e && e.target) e.target.classList.add('active');
+        handleSearch();
+    }
+
+    function footerNav(action, el) {
+        document.querySelectorAll('.footer-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        if (action === 'home') {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('inStockOnly').checked = false;
+            document.getElementById('autocompleteList').style.display = 'none';
+            const tags = document.querySelectorAll('.tag');
+            tags.forEach(t => t.classList.remove('active'));
+            tags[0].classList.add('active');
+            renderTable(allData.slice(0, 15));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (action === 'cart') {
+            toggleModal('cartModal', true);
+        } else if (action === 'price') {
+            toggleModal('priceModal', true);
+            renderPriceResults(brandPriceDB[currentSelectedBrand]);
+        } else if (action === 'profile') {
+            toggleModal('profileModal', true);
+        }
+    }
+
+    function toggleModal(modalId, show) {
+        document.getElementById(modalId).style.display = show ? 'flex' : 'none';
+    }
+
+    function closeModal(e, modalId) {
+        if (e.target.id === modalId) {
+            toggleModal(modalId, false);
+        }
+    }
+
+    function switchBrand(brandName) {
+        currentSelectedBrand = brandName;
+        document.querySelectorAll('.brand-tab').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('priceSearchInput').value = '';
+        renderPriceResults(brandPriceDB[currentSelectedBrand]);
+    }
+
+    function handlePriceSearch() {
+        const dataset = brandPriceDB[currentSelectedBrand] || [];
+        const query = document.getElementById('priceSearchInput').value.trim().toLowerCase();
+        const filtered = dataset.filter(item => item.p.toLowerCase().includes(query) || item.d.toLowerCase().includes(query));
+        renderPriceResults(filtered);
+    }
+
+    function renderPriceResults(items) {
+        const container = document.getElementById('priceResultList');
+        
+        let rawVal = parseFloat(document.getElementById('customDiscountInput').value);
+        let discountMultiplier = 0.74; // 預設防呆
+        
+        if (!isNaN(rawVal)) {
+            if (rawVal > 1) {
+                discountMultiplier = rawVal / 100; // 輸入 74 轉為 0.74
+            } else {
+                discountMultiplier = rawVal;      // 輸入 0.74 直接使用
+            }
+        }
+
+        if (!items || items.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-secondary);">查無此 ${currentSelectedBrand} 品牌型號資料</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const finalPrice = Math.round(item.listPrice * discountMultiplier);
+            const displayDiscount = Math.round(discountMultiplier * 100);
+
+            return `
+                <div class="price-item-card">
+                    <div class="price-info">
+                        <h4 onclick="copyToClipboard('${item.p}')" style="cursor:pointer;" title="點擊複製">${item.p}</h4>
+                        <p>${item.d}</p>
+                        <button class="negotiate-btn" onclick="alert('已為您發起 [${currentSelectedBrand}] ${item.p} 專案議價詢問，將由專人聯繫！')">💬 專案議價</button>
+                    </div>
+                    <div class="price-calc">
+                        <div class="list-price">牌價 $${item.listPrice}</div>
+                        <div>
+                            <span class="final-price">$${finalPrice}</span>
+                            <span class="discount-tag">${displayDiscount}折</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function copyToClipboard(text) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => showToast(text)).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        document.body.removeChild(area);
+        showToast(text);
+    }
+
+    function showToast(text) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = `已複製: ${text}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    function renderTable(items) {
+        document.getElementById('resultBody').innerHTML = items.map(item => `
+            <tr>
+                <td class="td-partno" onclick="copyToClipboard('${item.p}')">${item.p}</td>
+                <td>${item.d}</td>
+                <td style="text-align: right;"><span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : 'stock-ok'}">${item.s || 0}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    initDB();
+</script>
+</body>
+</html>
