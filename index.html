@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>軸受図書館 - 牌價與購物車系統</title>
+    <title>軸受図書館</title>
     
     <!-- PWA / iOS 支援設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -53,7 +53,7 @@
 
         .table-card { background-color: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; }
         .result-table { width: 100%; border-collapse: collapse; }
-        .result-table td { padding: 14px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        .result-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
         
         .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; padding: 8px; border-radius: 4px; transition: 0.2s; }
         .td-partno:hover { background-color: rgba(97, 176, 255, 0.1); }
@@ -62,17 +62,21 @@
         .stock-zero { background-color: rgba(227, 27, 35, 0.15); color: var(--skf-red); border-color: rgba(227, 27, 35, 0.3); }
         .stock-ok { background-color: rgba(0, 150, 0, 0.15); color: #4cd964; border-color: rgba(76, 217, 100, 0.3); }
 
+        /* 表格內的快速加購按鈕 (+) */
+        .table-add-btn { background: #2c323d; color: #4cd964; border: 1px solid #4cd964; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .table-add-btn:hover { background: #4cd964; color: #111; }
+
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 12px 24px; border-radius: 20px; font-weight: bold; z-index: 9999; animation: fadeInOut 2s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 
-        /* 底部導航欄 (4個按鈕) */
+        /* 底部導航欄 */
         .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
         .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; position: relative; }
         .footer-item.active { color: var(--skf-red); }
         .footer-icon { width: 22px; height: 22px; fill: currentColor; }
         .cart-badge-count { position: absolute; top: 2px; right: 35%; background: var(--skf-red); color: white; font-size: 10px; padding: 1px 5px; border-radius: 10px; font-weight: bold; display: none; }
 
-        /* 科技感牌價表與通用彈窗 Modal 樣式 */
+        /* 通用彈窗 Modal 樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
         .price-modal-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 90vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; border-top: 3px solid var(--skf-red); display: flex; flex-direction: column; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -155,14 +159,14 @@
         
         <div class="filter-controls">
             <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
-            <span style="font-size: 12px; color: var(--text-secondary);">點擊型號可快速複製</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">點擊型號可快速複製 | 點擊 [+] 加入購物車</span>
         </div>
     </div>
     <div id="loading" style="text-align:center; padding:20px;">正在連線資料庫...</div>
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
-<!-- 底部導航欄 (型錄首頁 / 購物車 / 各大品牌牌價 / 個人資訊) -->
+<!-- 底部導航欄 -->
 <footer class="app-footer">
     <button class="footer-item active" onclick="footerNav('home', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
@@ -191,15 +195,13 @@
             <button class="price-close-btn" onclick="toggleModal('priceModal', false)">✕</button>
         </div>
 
-        <!-- 品牌切換列 -->
         <div class="brand-tab-bar" id="brandTabBar">
-            <button class="brand-tab active" onclick="switchBrand('KOYO')">KOYO 台灣牌價</button>
-            <button class="brand-tab" onclick="switchBrand('FAG')">FAG 工業牌價</button>
+            <button class="brand-tab active" onclick="switchBrand('FAG')">FAG 完整牌價</button>
+            <button class="brand-tab" onclick="switchBrand('KOYO')">KOYO 台灣牌價</button>
             <button class="brand-tab" onclick="switchBrand('SKF')">SKF 精品牌價</button>
             <button class="brand-tab" onclick="switchBrand('ASAHI')">ASAHI 軸承座</button>
         </div>
 
-        <!-- 牌價查詢搜尋框 -->
         <div class="price-search-box">
             <div class="price-input-wrapper">
                 <input type="text" id="priceSearchInput" class="price-input" placeholder="請輸入型號關鍵字..." oninput="handlePriceSearch()">
@@ -207,7 +209,6 @@
             </div>
         </div>
 
-        <!-- 結果顯示區 -->
         <div class="price-results-area" id="priceResultList"></div>
     </div>
 </div>
@@ -219,9 +220,7 @@
             <div class="price-header-title">🛒 已選購清單 / 購物車</div>
             <button class="price-close-btn" onclick="toggleModal('cartModal', false)">✕</button>
         </div>
-        <div class="cart-content-area" id="cartContentArea">
-            <!-- 購物車清單內容由 JS 動態生成 -->
-        </div>
+        <div class="cart-content-area" id="cartContentArea"></div>
         <div class="cart-footer-bar" id="cartFooterBar">
             <div style="font-size: 14px; font-weight: bold;">總計金額：<span id="cartTotalPrice" style="color: #4cd964; font-size: 18px;">$0</span></div>
             <button class="checkout-btn" onclick="checkoutOrder()" style="width: auto; padding: 10px 25px;">送出詢價訂單</button>
@@ -242,14 +241,6 @@
                 <p style="margin: 0 0 6px 0; font-size: 14px; color: var(--text-main);">營運中心：高雄營運中心</p>
                 <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">系統權限：線上即時牌價試算、庫存連線查詢、量大議價</p>
             </div>
-            <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <p style="margin: 0 0 10px 0; font-weight: bold; color: #f3e5ab; font-size: 15px;">💡 快速操作指南</p>
-                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    <li>點擊型號文字即可一鍵複製。</li>
-                    <li>於各大品牌牌價試算中可直接將品項加入購物車或發起量大議價。</li>
-                    <li>支援手機 PWA 全螢幕免安裝操作。</li>
-                </ul>
-            </div>
         </div>
     </div>
 </div>
@@ -257,20 +248,59 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
     let allData = [];
-    let currentSelectedBrand = 'KOYO';
-    let cart = []; // 購物車陣列：[{ id, brand, partNo, desc, price, qty }]
+    let currentSelectedBrand = 'FAG';
+    let cart = []; // 購物車陣列
 
+    // 獨立的牌價資料庫（已完整帶入您從 Google 試算表提供的 FAG 牌價資料與預設 0.32 折數）
     const brandPriceDB = {
+        'FAG': [
+            { p: '607-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 400, discount: 0.32 },
+            { p: '608-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 390, discount: 0.32 },
+            { p: '609-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 410, discount: 0.32 },
+            { p: '607-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 480, discount: 0.32 },
+            { p: '608-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 510, discount: 0.32 },
+            { p: '609-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 540, discount: 0.32 },
+            { p: '624-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 480, discount: 0.32 },
+            { p: '625-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 400, discount: 0.32 },
+            { p: '626-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 400, discount: 0.32 },
+            { p: '627-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 420, discount: 0.32 },
+            { p: '628-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 580, discount: 0.32 },
+            { p: '629-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 440, discount: 0.32 },
+            { p: '625-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 460, discount: 0.32 },
+            { p: '626-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 500, discount: 0.32 },
+            { p: '627-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 480, discount: 0.32 },
+            { p: '628-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 650, discount: 0.32 },
+            { p: '629-2RS', d: 'FAG 深溝滾珠軸承', listPrice: 530, discount: 0.32 },
+            { p: '634-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 600, discount: 0.32 },
+            { p: '635-2Z', d: 'FAG 深溝滾珠軸承', listPrice: 530, discount: 0.32 },
+            { p: '16002', d: 'FAG 深溝滾珠軸承', listPrice: 740, discount: 0.32 },
+            { p: '16003', d: 'FAG 深溝滾珠軸承', listPrice: 900, discount: 0.32 },
+            { p: '16004', d: 'FAG 深溝滾珠軸承', listPrice: 930, discount: 0.32 },
+            { p: '16005', d: 'FAG 深溝滾珠軸承', listPrice: 1100, discount: 0.32 },
+            { p: '16006', d: 'FAG 深溝滾珠軸承', listPrice: 1300, discount: 0.32 },
+            { p: '16007', d: 'FAG 深溝滾珠軸承', listPrice: 1550, discount: 0.32 },
+            { p: '16008', d: 'FAG 深溝滾珠軸承', listPrice: 1700, discount: 0.32 },
+            { p: '16009', d: 'FAG 深溝滾珠軸承', listPrice: 2300, discount: 0.32 },
+            { p: '16010', d: 'FAG 深溝滾珠軸承', listPrice: 2500, discount: 0.32 },
+            { p: '6000', d: 'FAG 深溝滾珠軸承', listPrice: 340, discount: 0.32 },
+            { p: '6001', d: 'FAG 深溝滾珠軸承', listPrice: 360, discount: 0.32 },
+            { p: '6002', d: 'FAG 深溝滾珠軸承', listPrice: 370, discount: 0.32 },
+            { p: '6003', d: 'FAG 深溝滾珠軸承', listPrice: 400, discount: 0.32 },
+            { p: '6004', d: 'FAG 深溝滾珠軸承', listPrice: 420, discount: 0.32 },
+            { p: '6005', d: 'FAG 深溝滾珠軸承', listPrice: 520, discount: 0.32 },
+            { p: '6200', d: 'FAG 深溝滾珠軸承', listPrice: 300, discount: 0.32 },
+            { p: '6201', d: 'FAG 深溝滾珠軸承', listPrice: 340, discount: 0.32 },
+            { p: '6202', d: 'FAG 深溝滾珠軸承', listPrice: 360, discount: 0.32 },
+            { p: '6203', d: 'FAG 深溝滾珠軸承', listPrice: 380, discount: 0.32 },
+            { p: '6204', d: 'FAG 深溝滾珠軸承', listPrice: 470, discount: 0.32 },
+            { p: '6205', d: 'FAG 深溝滾珠軸承', listPrice: 590, discount: 0.32 },
+            { p: '6206', d: 'FAG 深溝滾珠軸承', listPrice: 780, discount: 0.32 }
+        ],
         'KOYO': [
             { p: '6205ZZ', d: '深溝滾珠軸承', listPrice: 450, discount: 0.35 },
             { p: '6206ZZ', d: '深溝滾珠軸承', listPrice: 580, discount: 0.35 },
             { p: '32015AV', d: '圓錐滾子軸承', listPrice: 2400, discount: 0.38 },
             { p: '6308ZZ', d: '深溝滾珠軸承', listPrice: 1150, discount: 0.35 }
-        ],
-        'FAG': [
-            { p: '6205ZZ', d: '深溝滾珠軸承 (FAG)', listPrice: 520, discount: 0.32 },
-            { p: '63072RS', d: '膠蓋深溝滾珠', listPrice: 980, discount: 0.32 },
-            { p: '32015JV', d: '圓錐滾子軸承', listPrice: 2800, discount: 0.30 }
         ],
         'SKF': [
             { p: '6205-2Z', d: 'Explorer 高效能軸承', listPrice: 650, discount: 0.30 },
@@ -445,6 +475,12 @@
         showToast(`已加入購物車: [${brand}] ${partNo}`);
     }
 
+    function addStockToCart(partNo, desc, stock) {
+        const brand = '即時庫存';
+        const price = 0; // 可依需求調整或由專人報價
+        addToCart(brand, partNo, `${desc} (庫存:${stock})`, price);
+    }
+
     function updateCartBadge() {
         const badge = document.getElementById('cartBadgeCount');
         const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -541,7 +577,7 @@
     function showToast(text) {
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerText = `已複製: ${text}`;
+        toast.innerText = `已加入/複製: ${text}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2000);
     }
@@ -552,6 +588,9 @@
                 <td class="td-partno" onclick="copyToClipboard('${item.p}')">${item.p}</td>
                 <td>${item.d}</td>
                 <td style="text-align: right;"><span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : 'stock-ok'}">${item.s || 0}</span></td>
+                <td style="text-align: center; width: 40px;">
+                    <button class="table-add-btn" onclick="addStockToCart('${item.p}', '${item.d}', '${item.s || 0}')" title="加入購物車">+</button>
+                </td>
             </tr>
         `).join('');
     }
