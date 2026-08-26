@@ -47,7 +47,7 @@
         .tag { background-color: #111; color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); white-space: nowrap; transition: 0.2s; }
         .tag.active { background-color: var(--skf-dark-blue); color: #fff; border-color: var(--skf-red); }
 
-        .filter-controls { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .filter-controls { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 13px; }
         .checkbox-label input { accent-color: var(--skf-red); width: 16px; height: 16px; margin-right: 8px; }
 
@@ -67,13 +67,14 @@
 
         /* 底部導航欄 (4個按鈕) */
         .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
-        .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; }
+        .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; position: relative; }
         .footer-item.active { color: var(--skf-red); }
         .footer-icon { width: 22px; height: 22px; fill: currentColor; }
+        .cart-badge-count { position: absolute; top: 2px; right: 35%; background: var(--skf-red); color: white; font-size: 10px; padding: 1px 5px; border-radius: 10px; font-weight: bold; display: none; }
 
         /* 科技感牌價表與通用彈窗 Modal 樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
-        .price-modal-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 90vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; border-top: 3px solid var(--skf-red); }
+        .price-modal-container { background: var(--bg-industrial); width: 100%; max-width: 650px; height: 90vh; border-radius: 16px 16px 0 0; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; position: relative; border-top: 3px solid var(--skf-red); display: flex; flex-direction: column; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .price-header { background: linear-gradient(135deg, var(--skf-dark-blue) 0%, #111 100%); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
@@ -81,29 +82,45 @@
         .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
         /* 品牌切換按鈕列 */
-        .brand-tab-bar { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .brand-tab-bar { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .brand-tab { background: #111; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .brand-tab.active { background: var(--skf-red); color: white; border-color: var(--skf-red); }
 
         /* 牌價查詢搜尋框 */
-        .price-search-box { padding: 15px; background: var(--bg-industrial); }
+        .price-search-box { padding: 15px; background: var(--bg-industrial); flex-shrink: 0; }
         .price-input-wrapper { display: flex; border: 2px solid var(--skf-dark-blue); border-radius: 6px; overflow: hidden; background: #111; }
         .price-input { flex: 1; border: none; background: transparent; color: #fff; padding: 12px 15px; font-size: 15px; outline: none; }
         .price-input::placeholder { color: var(--text-secondary); font-size: 13px; }
         .price-search-action { background: var(--skf-dark-blue); color: white; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
 
         /* 牌價結果清單 */
-        .price-results-area { padding: 0 15px 20px 15px; }
+        .price-results-area { padding: 0 15px 20px 15px; overflow-y: auto; flex-grow: 1; }
         .price-item-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .price-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #61b0ff; }
-        .price-info p { margin: 0; font-size: 12px; color: var(--text-secondary); }
+        .price-info p { margin: 0 0 6px 0; font-size: 12px; color: var(--text-secondary); }
         .price-calc { text-align: right; }
         .list-price { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
         .final-price { font-size: 16px; font-weight: bold; color: #4cd964; }
         .discount-tag { display: inline-block; background: rgba(227, 27, 35, 0.2); color: var(--skf-red); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
         
-        .negotiate-btn { background: #2c323d; color: #f3e5ab; border: 1px solid #d4af37; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 6px; }
+        .action-btn-group { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+        .negotiate-btn { background: #2c323d; color: #f3e5ab; border: 1px solid #d4af37; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .negotiate-btn:hover { background: #d4af37; color: #111; }
+        .add-cart-btn { background: #2c323d; color: #4cd964; border: 1px solid #4cd964; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .add-cart-btn:hover { background: #4cd964; color: #111; }
+
+        /* 購物車內容樣式 */
+        .cart-content-area { padding: 15px; overflow-y: auto; flex-grow: 1; }
+        .cart-item-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-item-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #61b0ff; }
+        .cart-item-info p { margin: 0; font-size: 12px; color: var(--text-secondary); }
+        .cart-item-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { background: #111; color: white; border: 1px solid var(--border-color); width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .qty-input { width: 40px; text-align: center; background: #111; border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 4px; font-size: 14px; }
+        .cart-delete-btn { background: rgba(227,27,35,0.2); color: var(--skf-red); border: 1px solid rgba(227,27,35,0.4); padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        
+        .cart-footer-bar { padding: 15px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .checkout-btn { background: var(--skf-red); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -138,6 +155,7 @@
         
         <div class="filter-controls">
             <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
+            <span style="font-size: 12px; color: var(--text-secondary);">點擊型號可快速複製</span>
         </div>
     </div>
     <div id="loading" style="text-align:center; padding:20px;">正在連線資料庫...</div>
@@ -153,6 +171,7 @@
     <button class="footer-item" onclick="footerNav('cart', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
         購物車
+        <span class="cart-badge-count" id="cartBadgeCount">0</span>
     </button>
     <button class="footer-item" onclick="footerNav('price', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/></svg>
@@ -180,10 +199,10 @@
             <button class="brand-tab" onclick="switchBrand('ASAHI')">ASAHI 軸承座</button>
         </div>
 
-        <!-- 搜尋框 -->
+        <!-- 牌價查詢搜尋框 -->
         <div class="price-search-box">
             <div class="price-input-wrapper">
-                <input type="text" id="priceSearchInput" class="price-input" placeholder="請輸入 KOYO, NSK, FAG, NTN 等型號..." oninput="handlePriceSearch()">
+                <input type="text" id="priceSearchInput" class="price-input" placeholder="請輸入型號關鍵字..." oninput="handlePriceSearch()">
                 <button class="price-search-action" onclick="handlePriceSearch()">試算</button>
             </div>
         </div>
@@ -200,8 +219,12 @@
             <div class="price-header-title">🛒 已選購清單 / 購物車</div>
             <button class="price-close-btn" onclick="toggleModal('cartModal', false)">✕</button>
         </div>
-        <div style="padding: 20px; color: var(--text-secondary); text-align: center;">
-            目前購物車尚無品項，請從型錄或牌價試算加入。
+        <div class="cart-content-area" id="cartContentArea">
+            <!-- 購物車清單內容由 JS 動態生成 -->
+        </div>
+        <div class="cart-footer-bar" id="cartFooterBar">
+            <div style="font-size: 14px; font-weight: bold;">總計金額：<span id="cartTotalPrice" style="color: #4cd964; font-size: 18px;">$0</span></div>
+            <button class="checkout-btn" onclick="checkoutOrder()" style="width: auto; padding: 10px 25px;">送出詢價訂單</button>
         </div>
     </div>
 </div>
@@ -213,10 +236,19 @@
             <div class="price-header-title">👤 個人資訊與設定</div>
             <button class="price-close-btn" onclick="toggleModal('profileModal', false)">✕</button>
         </div>
-        <div style="padding: 20px;">
-            <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff;">帳號狀態：VIP 業務經銷專用端</p>
-                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">地區：高雄營運中心</p>
+        <div style="padding: 20px; overflow-y: auto;">
+            <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;">
+                <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff; font-size: 16px;">帳號狀態：VIP 業務經銷專用端</p>
+                <p style="margin: 0 0 6px 0; font-size: 14px; color: var(--text-main);">營運中心：高雄營運中心</p>
+                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">系統權限：線上即時牌價試算、庫存連線查詢、量大議價</p>
+            </div>
+            <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #f3e5ab; font-size: 15px;">💡 快速操作指南</p>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                    <li>點擊型號文字即可一鍵複製。</li>
+                    <li>於各大品牌牌價試算中可直接將品項加入購物車或發起量大議價。</li>
+                    <li>支援手機 PWA 全螢幕免安裝操作。</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -226,6 +258,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
     let allData = [];
     let currentSelectedBrand = 'KOYO';
+    let cart = []; // 購物車陣列：[{ id, brand, partNo, desc, price, qty }]
 
     const brandPriceDB = {
         'KOYO': [
@@ -259,7 +292,10 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('searchInput').disabled = false;
             renderTable(allData.slice(0, 15));
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loading').innerHTML = '<span style="color:var(--skf-red);">資料庫連線失敗，請稍後再試</span>';
+        }
     }
 
     function handleInput() {
@@ -331,6 +367,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'cart') {
             toggleModal('cartModal', true);
+            renderCart();
         } else if (action === 'price') {
             toggleModal('priceModal', true);
             renderPriceResults(brandPriceDB[currentSelectedBrand]);
@@ -380,7 +417,10 @@
                     <div class="price-info">
                         <h4 onclick="copyToClipboard('${item.p}')" style="cursor:pointer;" title="點擊複製">${item.p}</h4>
                         <p>${item.d}</p>
-                        <button class="negotiate-btn" onclick="alert('已為您發起 [${currentSelectedBrand}] ${item.p} 量大議價詢問，將由專人聯繫！')">💬 量大議價</button>
+                        <div class="action-btn-group">
+                            <button class="negotiate-btn" onclick="alert('已為您發起 [${currentSelectedBrand}] ${item.p} 量大議價詢問，將由專人聯繫！')">💬 議價</button>
+                            <button class="add-cart-btn" onclick="addToCart('${currentSelectedBrand}', '${item.p}', '${item.d}', ${finalPrice})">🛒 加入購物車</button>
+                        </div>
                     </div>
                     <div class="price-calc">
                         <div class="list-price">牌價 $${item.listPrice}</div>
@@ -392,6 +432,89 @@
                 </div>
             `;
         }).join('');
+    }
+
+    function addToCart(brand, partNo, desc, price) {
+        const existing = cart.find(i => i.brand === brand && i.partNo === partNo);
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.push({ brand, partNo, desc, price, qty: 1 });
+        }
+        updateCartBadge();
+        showToast(`已加入購物車: [${brand}] ${partNo}`);
+    }
+
+    function updateCartBadge() {
+        const badge = document.getElementById('cartBadgeCount');
+        const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+        if (totalQty > 0) {
+            badge.innerText = totalQty;
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartContentArea');
+        const totalEl = document.getElementById('cartTotalPrice');
+        
+        if (cart.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">目前購物車尚無品項，請從各大品牌牌價試算加入。</div>`;
+            totalEl.innerText = '$0';
+            return;
+        }
+
+        let totalPrice = 0;
+        container.innerHTML = cart.map((item, index) => {
+            const subtotal = item.price * item.qty;
+            totalPrice += subtotal;
+            return `
+                <div class="cart-item-card">
+                    <div class="cart-item-info">
+                        <h4>[${item.brand}] ${item.partNo}</h4>
+                        <p>${item.desc} | 單價: $${item.price}</p>
+                    </div>
+                    <div class="cart-item-controls">
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                            <input type="text" class="qty-input" value="${item.qty}" readonly>
+                            <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                        </div>
+                        <button class="cart-delete-btn" onclick="removeFromCart(${index})">刪除</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        totalEl.innerText = `$${totalPrice.toLocaleString()}`;
+    }
+
+    function changeQty(index, delta) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) {
+            cart.splice(index, 1);
+        }
+        updateCartBadge();
+        renderCart();
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartBadge();
+        renderCart();
+    }
+
+    function checkoutOrder() {
+        if (cart.length === 0) {
+            alert('購物車是空的，無法送出訂單');
+            return;
+        }
+        alert('訂單已成功送出！高雄營運中心專人將盡快與您聯繫確認庫存與交期。');
+        cart = [];
+        updateCartBadge();
+        toggleModal('cartModal', false);
     }
 
     function copyToClipboard(text) {
