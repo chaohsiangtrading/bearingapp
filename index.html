@@ -81,7 +81,7 @@
         .price-header-title { font-size: 16px; font-weight: bold; color: #fff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
-        /* 品牌與折數控制列 */
+        /* 品牌與折數控制列 (修改處) */
         .brand-control-bar { display: flex; gap: 10px; padding: 15px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; align-items: center; }
         .brand-select { flex: 1; background: #111; color: #fff; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 14px; outline: none; }
         .discount-input-wrapper { display: flex; align-items: center; gap: 6px; background: #111; border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; }
@@ -99,11 +99,17 @@
         .price-results-area { padding: 0 15px 20px 15px; overflow-y: auto; flex-grow: 1; }
         .price-item-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .price-info h4 { margin: 0 0 4px 0; font-size: 15px; color: #61b0ff; }
-        .price-info p { margin: 0; font-size: 12px; color: var(--text-secondary); }
+        .price-info p { margin: 0 0 6px 0; font-size: 12px; color: var(--text-secondary); }
         .price-calc { text-align: right; }
         .list-price { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
         .final-price { font-size: 16px; font-weight: bold; color: #4cd964; }
         .discount-tag { display: inline-block; background: rgba(227, 27, 35, 0.2); color: var(--skf-red); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
+        
+        .action-btn-group { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+        .negotiate-btn { background: #2c323d; color: #f3e5ab; border: 1px solid #d4af37; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .negotiate-btn:hover { background: #d4af37; color: #111; }
+        .add-cart-btn { background: #2c323d; color: #4cd964; border: 1px solid #4cd964; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .add-cart-btn:hover { background: #4cd964; color: #111; }
 
         /* 購物車內容樣式 */
         .cart-content-area { padding: 15px; overflow-y: auto; flex-grow: 1; }
@@ -179,7 +185,7 @@
     </button>
 </footer>
 
-<!-- 各大品牌牌價表彈窗 (移除加入購物車與議價，改為純試算與點擊複製) -->
+<!-- 各大品牌牌價表彈窗 -->
 <div class="modal-overlay" id="priceModal" onclick="closeModal(event, 'priceModal')">
     <div class="price-modal-container">
         <div class="price-header">
@@ -187,13 +193,13 @@
             <button class="price-close-btn" onclick="toggleModal('priceModal', false)">✕</button>
         </div>
 
-        <!-- 品牌選擇下拉與自訂折數輸入 -->
+        <!-- 品牌選擇下拉與自訂折數輸入 (修改處) -->
         <div class="brand-control-bar">
             <select id="brandSelect" class="brand-select" onchange="onBrandChange()">
-                <option value="KOYO">KOYO 台灣牌價</option>
-                <option value="FAG">FAG 工業牌價</option>
-                <option value="SKF">SKF 精品牌價</option>
-                <option value="ASAHI">ASAHI 軸承座</option>
+                <option value="KOYO">KOYO 台灣牌價 (分頁: KOYO)</option>
+                <option value="FAG">FAG 工業牌價 (分頁: FAG)</option>
+                <option value="SKF">SKF 精品牌價 (分頁: SKF)</option>
+                <option value="ASAHI">ASAHI 軸承座 (分頁: ASAHI)</option>
             </select>
             <div class="discount-input-wrapper">
                 <span>折數:</span>
@@ -240,47 +246,54 @@
             <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;">
                 <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff; font-size: 16px;">帳號狀態：VIP 業務經銷專用端</p>
                 <p style="margin: 0 0 6px 0; font-size: 14px; color: var(--text-main);">營運中心：高雄營運中心</p>
-                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">系統權限：線上即時牌價試算、庫存連線查詢</p>
+                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">系統權限：線上即時牌價試算、庫存連線查詢、量大議價</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzdYSl0igF8fBvYLj4inVZ9NSHyoWa7A4fsL9N0aTp3Ym0g-rIorMDgTNEuxD-9bzmWrg/exec";
-    
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
     let allData = [];
     let currentSelectedBrand = 'KOYO';
     let cart = []; 
 
-    // 從後端抓取的多分頁牌價資料庫
-    let brandPriceDB = {
-        KOYO: [],
-        FAG: [],
-        SKF: [],
-        ASAHI: []
+    // 這裡對應你 Excel 檔中各個品牌分頁的資料 (可依需求擴充連結對應分頁資料)
+    const brandPriceDB = {
+        'KOYO': [
+            { p: '6205ZZ', d: '深溝滾珠軸承', listPrice: 450, defaultDiscount: 0.35 },
+            { p: '6206ZZ', d: '深溝滾珠軸承', listPrice: 580, defaultDiscount: 0.35 },
+            { p: '32015AV', d: '圓錐滾子軸承', listPrice: 2400, defaultDiscount: 0.38 },
+            { p: '6308ZZ', d: '深溝滾珠軸承', listPrice: 1150, defaultDiscount: 0.35 }
+        ],
+        'FAG': [
+            { p: '6205ZZ', d: '深溝滾珠軸承 (FAG)', listPrice: 520, defaultDiscount: 0.32 },
+            { p: '63072RS', d: '膠蓋深溝滾珠', listPrice: 980, defaultDiscount: 0.32 },
+            { p: '32015JV', d: '圓錐滾子軸承', listPrice: 2800, defaultDiscount: 0.30 }
+        ],
+        'SKF': [
+            { p: '6205-2Z', d: 'Explorer 高效能軸承', listPrice: 650, defaultDiscount: 0.30 },
+            { p: '6206-2Z', d: 'Explorer 高效能軸承', listPrice: 820, defaultDiscount: 0.30 },
+            { p: 'NJ205ECP', d: '圓柱滾子軸承', listPrice: 1500, defaultDiscount: 0.28 }
+        ],
+        'ASAHI': [
+            { p: 'UCP205', d: '立式軸承座', listPrice: 620, defaultDiscount: 0.40 },
+            { p: 'UCP206', d: '立式軸承座', listPrice: 750, defaultDiscount: 0.40 },
+            { p: 'UCF205', d: '方型四孔軸承座', listPrice: 680, defaultDiscount: 0.40 }
+        ]
     };
 
     async function initDB() {
         try {
             const res = await fetch(GAS_URL);
             const resData = await res.json();
-            
-            // 假設後端主資料庫放在 resData.data，牌價分頁放在 resData (KOYO, FAG, SKF, ASAHI)
-            allData = resData.data || [];
-            
-            // 綁定各大品牌牌價資料
-            if (resData.KOYO) brandPriceDB.KOYO = resData.KOYO;
-            if (resData.FAG) brandPriceDB.FAG = resData.FAG;
-            if (resData.SKF) brandPriceDB.SKF = resData.SKF;
-            if (resData.ASAHI) brandPriceDB.ASAHI = resData.ASAHI;
-
+            allData = resData.data;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('searchInput').disabled = false;
             renderTable(allData.slice(0, 15));
         } catch (e) {
             console.error(e);
-            document.getElementById('loading').innerHTML = '<span style="color:var(--skf-red);">資料庫連線失敗，請檢查 GAS 部署是否正確</span>';
+            document.getElementById('loading').innerHTML = '<span style="color:var(--skf-red);">資料庫連線失敗，請稍後再試</span>';
         }
     }
 
@@ -376,6 +389,9 @@
         const select = document.getElementById('brandSelect');
         currentSelectedBrand = select.value;
         const dataset = brandPriceDB[currentSelectedBrand] || [];
+        if (dataset.length > 0 && dataset[0].defaultDiscount !== undefined) {
+            document.getElementById('customDiscountInput').value = dataset[0].defaultDiscount;
+        }
         document.getElementById('priceSearchInput').value = '';
         renderPriceResults(dataset);
     }
@@ -387,7 +403,6 @@
         renderPriceResults(filtered);
     }
 
-    // 渲染牌價結果（不含購物車，點擊型號可直接複製）
     function renderPriceResults(items) {
         const container = document.getElementById('priceResultList');
         const userDiscount = parseFloat(document.getElementById('customDiscountInput').value) || 0.35;
@@ -402,21 +417,36 @@
             const discountPercentage = Math.round(userDiscount * 100);
 
             return `
-                <div class="price-item-card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                <div class="price-item-card">
                     <div class="price-info">
-                        <h4 onclick="copyToClipboard('${item.p}')" style="cursor:pointer; color:#61b0ff; margin:0 0 4px 0; font-size:15px;" title="點擊複製型號">${item.p} <span style="font-size:11px; color:var(--text-secondary);">(點擊複製)</span></h4>
-                        <p style="margin:0; font-size:12px; color:var(--text-secondary);">${item.d}</p>
+                        <h4 onclick="copyToClipboard('${item.p}')" style="cursor:pointer;" title="點擊複製">${item.p}</h4>
+                        <p>${item.d}</p>
+                        <div class="action-btn-group">
+                            <button class="negotiate-btn" onclick="alert('已為您發起 [${currentSelectedBrand}] ${item.p} 量大議價詢問，將由專人聯繫！')">💬 議價</button>
+                            <button class="add-cart-btn" onclick="addToCart('${currentSelectedBrand}', '${item.p}', '${item.d}', ${finalPrice})">🛒 加入購物車</button>
+                        </div>
                     </div>
-                    <div class="price-calc" style="text-align: right;">
-                        <div class="list-price" style="font-size: 12px; color: var(--text-secondary); text-decoration: line-through;">牌價 $${item.listPrice}</div>
+                    <div class="price-calc">
+                        <div class="list-price">牌價 $${item.listPrice}</div>
                         <div>
-                            <span class="final-price" style="font-size: 16px; font-weight: bold; color: #4cd964;">$${finalPrice}</span>
-                            <span class="discount-tag" style="background: rgba(227, 27, 35, 0.2); color: var(--skf-red); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px;">${discountPercentage}折</span>
+                            <span class="final-price">$${finalPrice}</span>
+                            <span class="discount-tag">${discountPercentage}折</span>
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
+    }
+
+    function addToCart(brand, partNo, desc, price) {
+        const existing = cart.find(i => i.brand === brand && i.partNo === partNo);
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.push({ brand, partNo, desc, price, qty: 1 });
+        }
+        updateCartBadge();
+        showToast(`已加入購物車: [${brand}] ${partNo}`);
     }
 
     function updateCartBadge() {
@@ -435,7 +465,7 @@
         const totalEl = document.getElementById('cartTotalPrice');
         
         if (cart.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">目前購物車尚無品項。</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">目前購物車尚無品項，請從各大品牌牌價試算加入。</div>`;
             totalEl.innerText = '$0';
             return;
         }
