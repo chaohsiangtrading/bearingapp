@@ -76,7 +76,7 @@
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #4cd964; color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 9999; animation: fadeInOut 2s forwards; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 13px; }
         @keyframes fadeInOut { 0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 
-        /* 底部導航欄 (首頁 / 購物車 / 最新消息 / 個人資訊) */
+        /* 底部導航欄 */
         .app-footer { background-color: var(--skf-black); height: 60px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; position: fixed; bottom: 0; width: 100%; max-width: 650px; left: 50%; transform: translateX(-50%); z-index: 100; }
         .footer-item { text-decoration: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 3px; flex: 1; cursor: pointer; transition: color 0.2s; background: none; border: none; outline: none; position: relative; }
         .footer-item.active { color: var(--skf-red); }
@@ -155,7 +155,7 @@
             <span style="font-size: 12px; color: var(--text-secondary);">點擊型號複製 | 點擊 [+] 加入購物車</span>
         </div>
     </div>
-    <div id="loading" style="text-align:center; padding:20px;">正在連線資料庫...</div>
+    <div id="loading" style="text-align:center; padding:15px; font-size:13px; color:var(--text-secondary);">連線中...</div>
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
@@ -251,7 +251,7 @@
 
 <script>
     // ==========================================
-    // ⚙️ 系統核心設定 (你的 LINE OA Basic ID)
+    // ⚙️ 系統核心設定
     // ==========================================
     const LINE_OA_ID = "@oel5184g"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
@@ -259,17 +259,112 @@
     let allData = [];
     let cart = []; // 購物車陣列
 
-    async function initDB() {
+    // ==========================================
+    // 🗄️ IndexedDB 本地大容量高速引擎 (瞬開與防崩潰核心)
+    // ==========================================
+    const DB_NAME = "TFB_BEARING_DB";
+    const STORE_NAME = "bearings";
+
+    function openLocalDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+
+    async function getLocalCache() {
         try {
-            const res = await fetch(GAS_URL);
-            const resData = await res.json();
-            allData = resData.data;
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('searchInput').disabled = false;
-            renderTable(allData.slice(0, 15));
+            const db = await openLocalDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.get("inventory_data");
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => resolve(null);
+            });
+        } catch {
+            return null;
+        }
+    }
+
+    async function setLocalCache(data) {
+        try {
+            const db = await openLocalDB();
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            store.put(data, "inventory_data");
         } catch (e) {
-            console.error(e);
-            document.getElementById('loading').innerHTML = '<span style="color:var(--skf-red);">資料庫連線失敗，請稍後再試</span>';
+            console.warn("本地儲存暫時失敗", e);
+        }
+    }
+
+    // 帶超時中斷的 fetch (避免手機網路遲鈍卡死)
+    function fetchWithTimeout(url, timeoutMs = 9000) {
+        return new Promise((resolve, reject) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => {
+                controller.abort();
+                reject(new Error("Timeout"));
+            }, timeoutMs);
+
+            fetch(url, { signal: controller.signal })
+                .then(res => {
+                    clearTimeout(timer);
+                    resolve(res);
+                })
+                .catch(err => {
+                    clearTimeout(timer);
+                    reject(err);
+                });
+        });
+    }
+
+    // ==========================================
+    // ⚡ 核心初始化 (瞬開 + 背景無感同步)
+    // ==========================================
+    async function initDB() {
+        const loadingEl = document.getElementById('loading');
+        const searchInput = document.getElementById('searchInput');
+
+        // 第一步：先抓取手機/電腦本地快取 (0.05秒瞬開)
+        const localData = await getLocalCache();
+        if (localData && localData.length > 0) {
+            allData = localData;
+            loadingEl.style.display = 'none';
+            searchInput.disabled = false;
+            renderTable(allData.slice(0, 20));
+        }
+
+        // 第二步：背景無感向 Google 試算表請求最新庫存 (Stale-While-Revalidate)
+        try {
+            const res = await fetchWithTimeout(GAS_URL, 9000);
+            const resData = await res.json();
+            
+            if (resData && resData.data && resData.data.length > 0) {
+                allData = resData.data;
+                setLocalCache(allData); // 默默存回本地，供下次秒開
+                
+                // 若剛剛是完全沒快取的初次訪客，立即渲染
+                if (!localData || localData.length === 0) {
+                    loadingEl.style.display = 'none';
+                    searchInput.disabled = false;
+                    renderTable(allData.slice(0, 20));
+                }
+            }
+        } catch (e) {
+            console.warn("背景同步稍有延遲，繼續採用本機快取:", e);
+            if (!localData || localData.length === 0) {
+                loadingEl.innerHTML = '<span style="color:var(--skf-red);">連線稍慢，正在重試中...</span>';
+                // 3 秒後自動重試一次
+                setTimeout(initDB, 3000);
+            }
         }
     }
 
@@ -366,7 +461,7 @@
     }
 
     // ==========================================
-    // 🛒 購物車核心
+    // 🛒 購物車功能
     // ==========================================
     function addToCartFromTable(partNo, desc, stock) {
         const existing = cart.find(i => i.partNo === partNo);
@@ -446,40 +541,31 @@
     }
 
     // ==========================================
-    // ⚡ 強制喚醒 LINE App 核心邏輯 (保證不卡在網頁)
+    // ⚡ 強制喚醒 LINE App 核心邏輯
     // ==========================================
     function launchLineDirect(messageText) {
-        // 1. 自動把明細拷貝到剪貼簿 (雙重保險)
         silentCopy(messageText);
 
         const cleanId = LINE_OA_ID.replace(/^@/, '');
         const encodedId = '%40' + cleanId;
         const encodedMsg = encodeURIComponent(messageText);
 
-        // 2. 判定裝置
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // 先嘗試用官方 URL Scheme 帶入文字
             const oaUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
-            
-            // 同時設定備援方案：若客戶尚未加好友，1.2 秒後強制開啟加好友聊天室
             const fallbackAddFriend = `https://line.me/R/ti/p/${encodedId}`;
             
-            // 直接重定向喚醒 App
             window.location.href = oaUrl;
 
             setTimeout(() => {
-                // 若仍在當前畫面代表 oaMessage 沒打開成功，轉向聊天好友主頁
                 window.location.href = fallbackAddFriend;
             }, 1200);
         } else {
-            // 電腦版瀏覽器
             window.open(`https://line.me/R/ti/p/${encodedId}`, '_blank');
         }
     }
 
-    // 背景靜默複製詢價文字
     function silentCopy(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).catch(() => {});
@@ -495,9 +581,6 @@
         }
     }
 
-    // ==========================================
-    // 🚀 送出詢價訂單
-    // ==========================================
     function checkoutOrder() {
         if (cart.length === 0) {
             alert('購物車目前尚無品項，無法送出訂單！');
@@ -524,16 +607,13 @@
         message += `品項總數：${cart.length} 項 | 需求總數：${totalQty} pcs\n\n`;
         message += `請協助確認現有庫存量與正式報價，感謝！`;
 
-        // 喚醒 LINE
         launchLineDirect(message);
 
-        // 清空購物車
         cart = [];
         updateCartBadge();
         toggleModal('cartModal', false);
     }
 
-    // 轉客服代查專屬連結
     function contactAgentForSearch() {
         const currentInput = document.getElementById('searchInput').value.trim();
         let text = `您好，我想請才富軸承客服協助查詢尺寸與報價：`;
@@ -575,7 +655,6 @@
         setTimeout(() => toast.remove(), 2000);
     }
 
-    // 渲染搜尋列表（加入 ＋ 號按鈕）
     function renderTable(items) {
         document.getElementById('resultBody').innerHTML = items.map(item => `
             <tr>
