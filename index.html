@@ -40,7 +40,7 @@
         /* 尺寸提示與客服代查快捷列 */
         .search-hint-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
         .hint-text { color: #f3e5ab; font-weight: 500; }
-        .agent-link-btn { background: rgba(97, 176, 255, 0.15); color: #61b0ff; border: 1px solid rgba(97, 176, 255, 0.3); padding: 3px 8px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 11px; }
+        .agent-link-btn { background: rgba(97, 176, 255, 0.15); color: #61b0ff; border: 1px solid rgba(97, 176, 255, 0.3); padding: 4px 10px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 12px; font-weight: bold; }
         .agent-link-btn:hover { background: #61b0ff; color: #111; }
 
         /* Auto-complete 下拉清單 */
@@ -180,7 +180,7 @@
     </button>
 </footer>
 
-<!-- 最新消息與 AI 話題彈窗 (每週更新) -->
+<!-- 最新消息彈窗 -->
 <div class="modal-overlay" id="newsModal" onclick="closeModal(event, 'newsModal')">
     <div class="price-modal-container">
         <div class="price-header">
@@ -188,7 +188,6 @@
             <button class="price-close-btn" onclick="toggleModal('newsModal', false)">✕</button>
         </div>
         <div style="padding: 16px; overflow-y: auto;">
-            <!-- AI話題卡片 -->
             <div class="news-card">
                 <span class="news-badge badge-ai">🤖 AI 工業前沿</span>
                 <h4 style="margin: 0 0 8px 0; color: #61b0ff; font-size: 15px;">AI 視覺與多模態大模型如何加速非標軸承辨識？</h4>
@@ -252,13 +251,13 @@
 
 <script>
     // ==========================================
-    // ⚙️ 系統核心設定 (請替換為你的 LINE OA Basic ID，需帶 @)
+    // ⚙️ 系統核心設定 (你的 LINE OA Basic ID)
     // ==========================================
-    const LINE_OA_ID = "%40oel5184g";
+    const LINE_OA_ID = "@oel5184g"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
 
     let allData = [];
-    let cart = []; // 購物車陣列：[{ partNo, desc, qty, stock }]
+    let cart = []; // 購物車陣列
 
     async function initDB() {
         try {
@@ -367,7 +366,7 @@
     }
 
     // ==========================================
-    // 🛒 購物車核心邏輯 (支援首頁列表加入)
+    // 🛒 購物車核心
     // ==========================================
     function addToCartFromTable(partNo, desc, stock) {
         const existing = cart.find(i => i.partNo === partNo);
@@ -447,7 +446,57 @@
     }
 
     // ==========================================
-    // 🚀 送出詢價訂單 (跳轉 LINE)
+    // ⚡ 強制喚醒 LINE App 核心邏輯 (保證不卡在網頁)
+    // ==========================================
+    function launchLineDirect(messageText) {
+        // 1. 自動把明細拷貝到剪貼簿 (雙重保險)
+        silentCopy(messageText);
+
+        const cleanId = LINE_OA_ID.replace(/^@/, '');
+        const encodedId = '%40' + cleanId;
+        const encodedMsg = encodeURIComponent(messageText);
+
+        // 2. 判定裝置
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // 先嘗試用官方 URL Scheme 帶入文字
+            const oaUrl = `https://line.me/R/oaMessage/${encodedId}/?${encodedMsg}`;
+            
+            // 同時設定備援方案：若客戶尚未加好友，1.2 秒後強制開啟加好友聊天室
+            const fallbackAddFriend = `https://line.me/R/ti/p/${encodedId}`;
+            
+            // 直接重定向喚醒 App
+            window.location.href = oaUrl;
+
+            setTimeout(() => {
+                // 若仍在當前畫面代表 oaMessage 沒打開成功，轉向聊天好友主頁
+                window.location.href = fallbackAddFriend;
+            }, 1200);
+        } else {
+            // 電腦版瀏覽器
+            window.open(`https://line.me/R/ti/p/${encodedId}`, '_blank');
+        }
+    }
+
+    // 背景靜默複製詢價文字
+    function silentCopy(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(() => {});
+        } else {
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.left = "-9999px";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand('copy');
+            document.body.removeChild(area);
+        }
+    }
+
+    // ==========================================
+    // 🚀 送出詢價訂單
     // ==========================================
     function checkoutOrder() {
         if (cart.length === 0) {
@@ -475,12 +524,10 @@
         message += `品項總數：${cart.length} 項 | 需求總數：${totalQty} pcs\n\n`;
         message += `請協助確認現有庫存量與正式報價，感謝！`;
 
-        const encodedMsg = encodeURIComponent(message);
-        const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodedMsg}`;
+        // 喚醒 LINE
+        launchLineDirect(message);
 
-        window.open(lineUrl, '_blank');
-        alert('已為您開啟 LINE！請於對話視窗點擊「送出」，專人將立即為您報價。');
-
+        // 清空購物車
         cart = [];
         updateCartBadge();
         toggleModal('cartModal', false);
@@ -489,14 +536,14 @@
     // 轉客服代查專屬連結
     function contactAgentForSearch() {
         const currentInput = document.getElementById('searchInput').value.trim();
-        let text = `您好，我想請客服專員協助查詢軸承尺寸與報價：`;
+        let text = `您好，我想請才富軸承客服協助查詢尺寸與報價：`;
         if (currentInput) {
             text += `\n【欲查詢型號/尺寸】：${currentInput}`;
         } else {
             text += `\n(我有特殊規格/止推/滾針尺寸需要比對)`;
         }
-        const encoded = encodeURIComponent(text);
-        window.open(`https://line.me/R/oaMessage/${LINE_OA_ID}/?${encoded}`, '_blank');
+        
+        launchLineDirect(text);
     }
 
     function copyToClipboard(text) {
