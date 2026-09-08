@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>軸受図書館 (才富) - 軸受の製葯</title>
+    <title>軸受図書館 (才富) - 軸承規格與庫存速查</title>
     
     <!-- PWA / iOS 支援設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -60,16 +60,19 @@
 
         .table-card { background-color: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; }
         .result-table { width: 100%; border-collapse: collapse; }
-        .result-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
+        .result-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
+        
+        .bearing-icon-cell { width: 44px; text-align: center; }
+        .bearing-mini-icon { width: 36px; height: 36px; background: #151921; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #2d3340; }
         
         .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; }
         .td-partno:hover { text-decoration: underline; }
+        .td-desc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
         
         .stock-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; border: 1px solid; min-width: 28px; text-align: center; }
         .stock-zero { background-color: rgba(227, 27, 35, 0.15); color: var(--skf-red); border-color: rgba(227, 27, 35, 0.3); }
         .stock-ok { background-color: rgba(0, 150, 0, 0.15); color: #4cd964; border-color: rgba(76, 217, 100, 0.3); }
 
-        /* 列表快速加入購物車按鈕 (+) */
         .add-row-cart-btn { background: #111; color: #4cd964; border: 1px solid #4cd964; width: 28px; height: 28px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; margin-left: 6px; }
         .add-row-cart-btn:hover { background: #4cd964; color: #000; }
 
@@ -92,11 +95,16 @@
         .price-header-title { font-size: 16px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px; }
         .price-close-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
 
-        /* 最新消息樣式卡片 */
-        .news-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
-        .news-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; }
-        .badge-ai { background: rgba(97, 176, 255, 0.2); color: #61b0ff; border: 1px solid rgba(97, 176, 255, 0.4); }
-        .badge-update { background: rgba(227, 27, 35, 0.2); color: var(--skf-red); border: 1px solid rgba(227, 27, 35, 0.4); }
+        /* 代號速查表格樣式 */
+        .spec-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+        .spec-title { font-size: 14px; font-weight: bold; color: #f3e5ab; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .spec-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        .spec-table th { background: #151921; color: var(--text-secondary); padding: 8px; border: 1px solid var(--border-color); font-weight: normal; }
+        .spec-table td { padding: 8px; border: 1px solid var(--border-color); }
+
+        /* 傳照與急件樣式 */
+        .urgent-callout { background: linear-gradient(135deg, rgba(227,27,35,0.15) 0%, rgba(0,43,73,0.3) 100%); border: 1px solid var(--skf-red); border-radius: 8px; padding: 16px; margin-bottom: 15px; }
+        .urgent-btn { background: #06C755; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 15px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; margin-top: 10px; }
 
         /* 購物車內容樣式 */
         .cart-content-area { padding: 15px; overflow-y: auto; flex-grow: 1; }
@@ -152,14 +160,14 @@
         
         <div class="filter-controls">
             <label class="checkbox-label"><input type="checkbox" id="inStockOnly" onchange="handleSearch()"> 僅顯示有現貨</label>
-            <span style="font-size: 12px; color: var(--text-secondary);">點擊型號複製 | 點擊 [+] 加入購物車</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">點擊型號複製 | 點擊 [+] 加入詢價</span>
         </div>
     </div>
     <div id="loading" style="text-align:center; padding:15px; font-size:13px; color:var(--text-secondary);">正在連線資料庫...</div>
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
-<!-- 底部導航欄 -->
+<!-- 底部導航欄（改造：首頁、購物車、廠牌代號、傳照急件） -->
 <footer class="app-footer">
     <button class="footer-item active" onclick="footerNav('home', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
@@ -167,43 +175,100 @@
     </button>
     <button class="footer-item" onclick="footerNav('cart', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M832 341.333333H725.333333V256a213.333333 213.333333 0 0 0-426.666666 0v85.333333H192a85.333333 85.333333 0 0 0-85.333333 85.333334l42.666666 469.333333a85.333333 85.333333 0 0 0 85.333334 76.8h597.333333a85.333333 85.333333 0 0 0 85.333333-76.8l42.666667-469.333333A85.333333 85.333333 0 0 0 832 341.333333z" fill="currentColor"></path></svg>
-        購物車
+        詢價車
         <span class="cart-badge-count" id="cartBadgeCount">0</span>
     </button>
-    <button class="footer-item" onclick="footerNav('news', this)">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M896 128H128a64 64 0 0 0-64 64v640a64 64 0 0 0 64 64h768a64 64 0 0 0 64-64V192a64 64 0 0 0-64-64z m-64 640H192V256h640zM256 320h384v64H256z m0 128h512v64H256z m0 128h512v64H256z m0 128h320v64H256z"/></svg>
-        最新消息
+    <button class="footer-item" onclick="footerNav('suffixModal', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M128 192h768v128H128z m0 256h768v128H128z m0 256h512v128H128z"/></svg>
+        廠牌字尾
     </button>
-    <button class="footer-item" onclick="footerNav('profile', this)">
-        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M512 512a192 192 0 1 0-192-192 192 192 0 0 0 192 192zm0 96c-128 0-384 64-384 192v64h768v-64c0-128-256-192-384-192z"/></svg>
-        個人資訊
+    <button class="footer-item" onclick="footerNav('urgentModal', this)">
+        <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M864 224H704l-64-64H384l-64 64H160C107 224 64 267 64 320v448c0 53 43 96 96 96h704c53 0 96-43 96-96V320c0-53-43-96-96-96zM512 704c-88.4 0-160-71.6-160-160s71.6-160 160-160 160 71.6 160 160-71.6 160-160 160z"/></svg>
+        傳照急件
     </button>
 </footer>
 
-<!-- 最新消息彈窗 -->
-<div class="modal-overlay" id="newsModal" onclick="closeModal(event, 'newsModal')">
+<!-- 廠牌字尾對照表彈窗 -->
+<div class="modal-overlay" id="suffixModal" onclick="closeModal(event, 'suffixModal')">
     <div class="price-modal-container">
         <div class="price-header">
-            <div class="price-header-title">📢 每週動態與 AI 工業話題</div>
-            <button class="price-close-btn" onclick="toggleModal('newsModal', false)">✕</button>
+            <div class="price-header-title">🔍 軸承廠牌字尾 & 規格速查</div>
+            <button class="price-close-btn" onclick="toggleModal('suffixModal', false)">✕</button>
         </div>
         <div style="padding: 16px; overflow-y: auto;">
-            <div class="news-card">
-                <span class="news-badge badge-ai">🤖 AI 工業前沿</span>
-                <h4 style="margin: 0 0 8px 0; color: #61b0ff; font-size: 15px;">AI 視覺與多模態大模型如何加速非標軸承辨識？</h4>
-                <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    以往工廠維修現場遇到無鋼印、磨損嚴重的止推或滾針軸承，需要耗費大量時間測量內徑、外徑與厚度。目前結合高精確度影像與幾何參數大語言模型，輸入規格數字（例如：41*63*18）即可自動比對跨廠牌替代型號，大幅縮短停機待料時間。
-                </p>
-                <div style="margin-top: 10px; font-size: 11px; color: #7f8691;">發布週期：2026年9月第1週</div>
+            <div class="spec-card">
+                <div class="spec-title">🛡️ 密封防塵蓋對照表 (最常混淆)</div>
+                <table class="spec-table">
+                    <thead>
+                        <tr><th>類型</th><th>SKF</th><th>NSK</th><th>NTN</th><th>KOYO / FAG</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>雙面鐵蓋</td><td style="color:#61b0ff;">2Z</td><td>ZZ</td><td>ZZ</td><td>ZZ / 2Z</td></tr>
+                        <tr><td>接觸橡膠</td><td style="color:#61b0ff;">2RS1</td><td>DDU</td><td>LLU</td><td>2RS / 2RSR</td></tr>
+                        <tr><td>非接觸橡膠</td><td style="color:#61b0ff;">2RZ</td><td>VV</td><td>LLB</td><td>2RU / 2RSD</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="news-card">
-                <span class="news-badge badge-update">📦 庫存動態更新</span>
-                <h4 style="margin: 0 0 8px 0; color: #f3e5ab; font-size: 15px;">本週進口現貨抵港：NACHI / JBS / NTN 特殊規格</h4>
-                <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    包含止推軸承、特殊英制系列以及重載軸承座系列現貨已更新入庫。若庫存數量顯示為 0 或查無特定字尾，可直接使用「客服代查」洽詢保稅庫或原廠期貨配額。
+            <div class="spec-card">
+                <div class="spec-title">⚙️ 內部游隙代號 (Clearance)</div>
+                <table class="spec-table">
+                    <thead>
+                        <tr><th>代號</th><th>意義與常用場合</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><b>C2</b></td><td>游隙小於標準（高精度、低震動主軸）</td></tr>
+                        <tr><td><b>標準 (CN)</b></td><td>一般標準游隙，通常型號上不標示</td></tr>
+                        <tr><td><b style="color:#4cd964;">C3</b></td><td>大於標準，<b>台灣馬達、高溫、高轉速最常用規格</b></td></tr>
+                        <tr><td><b>C4</b></td><td>高溫熱膨脹重負載專用（如鋼廠、烘乾滾筒）</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="spec-card">
+                <div class="spec-title">🧱 保持架材質代號</div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 6px 0;">無標示通常為標準沖壓鋼板保持架</p>
+                <table class="spec-table">
+                    <tbody>
+                        <tr><td style="width:35%;"><b>M / MA / MB</b></td><td>黃銅保持架（重載、衝擊震動環境適用）</td></tr>
+                        <tr><td><b>TN9 / TVH / TNG</b></td><td>工程塑膠 / 強化尼龍（運轉安靜、輕量化）</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 傳照代查與門市取貨彈窗 -->
+<div class="modal-overlay" id="urgentModal" onclick="closeModal(event, 'urgentModal')">
+    <div class="price-modal-container">
+        <div class="price-header">
+            <div class="price-header-title">📸 拍照代查 / 門市取貨</div>
+            <button class="price-close-btn" onclick="toggleModal('urgentModal', false)">✕</button>
+        </div>
+        <div style="padding: 16px; overflow-y: auto;">
+            <div class="urgent-callout">
+                <h4 style="margin: 0 0 6px 0; color: #fff; font-size: 15px;">鋼印磨損？不知道型號？</h4>
+                <p style="margin: 0; font-size: 13px; color: #cbd5e1; line-height: 1.5;">
+                    請用卡尺量測「內徑*外徑*厚度」，或直接將損壞軸承拍照，一鍵送至 LINE 客服，專人立即為您比對替代品與庫存！
                 </p>
-                <div style="margin-top: 10px; font-size: 11px; color: #7f8691;">更新頻率：每週定期校對</div>
+                <button class="urgent-btn" onclick="launchPhotoInquiry()">
+                    💬 立即拍照 / 傳圖給專人查詢
+                </button>
+            </div>
+
+            <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
+                <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff; font-size: 15px;">🏢 才富軸承行 (高雄營運處)</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-main);">📍 支援高雄及周邊工業區現貨調度、急件叫貨與門市自取。</p>
+                <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">在庫品牌：SKF、FAG、NSK、NTN、KOYO、NACHI、ASAHI、TIMKEN 等各大原廠現貨。</p>
+            </div>
+
+            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #f3e5ab; font-size: 13px;">💡 快速查驗技巧</p>
+                <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                    <li>拍軸承兩側端面，通常可看到細微刻印字樣。</li>
+                    <li>若鋼印已平，請附上：軸心直徑、外殼安裝孔徑、軸承厚度。</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -213,38 +278,13 @@
 <div class="modal-overlay" id="cartModal" onclick="closeModal(event, 'cartModal')">
     <div class="price-modal-container">
         <div class="price-header">
-            <div class="price-header-title">🛒 已選購清單 / 購物車</div>
+            <div class="price-header-title">🛒 已選購清單 / 詢價單</div>
             <button class="price-close-btn" onclick="toggleModal('cartModal', false)">✕</button>
         </div>
         <div class="cart-content-area" id="cartContentArea"></div>
         <div class="cart-footer-bar" id="cartFooterBar">
             <div style="font-size: 14px; font-weight: bold;">品項總計：<span id="cartTotalSummary" style="color: #4cd964; font-size: 16px;">0 項</span></div>
             <button class="checkout-btn" onclick="checkoutOrder()" style="width: auto; padding: 10px 25px;">送出詢價訂單</button>
-        </div>
-    </div>
-</div>
-
-<!-- 個人資訊彈窗 -->
-<div class="modal-overlay" id="profileModal" onclick="closeModal(event, 'profileModal')">
-    <div class="price-modal-container">
-        <div class="price-header">
-            <div class="price-header-title">👤 個人資訊與設定</div>
-            <button class="price-close-btn" onclick="toggleModal('profileModal', false)">✕</button>
-        </div>
-        <div style="padding: 20px; overflow-y: auto;">
-            <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px;">
-                <p style="margin: 0 0 8px 0; font-weight: bold; color: #61b0ff; font-size: 16px;">服務機構：才富軸承行</p>
-                <p style="margin: 0 0 6px 0; font-size: 14px; color: var(--text-main);">營運中心：高雄營運中心</p>
-                <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">系統功能：庫存查詢、尺寸規格比對、LINE 即時線上詢價</p>
-            </div>
-            <div style="background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <p style="margin: 0 0 10px 0; font-weight: bold; color: #f3e5ab; font-size: 15px;">💡 操作提示</p>
-                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    <li>點擊型號名稱可快速複製到剪貼簿。</li>
-                    <li>點擊列表右側的「+」按鈕即可加入詢價清單。</li>
-                    <li>支援尺寸輸入（如 41*63*18 或 31.7*53*18）查詢對應品項。</li>
-                </ul>
-            </div>
         </div>
     </div>
 </div>
@@ -257,10 +297,10 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzvSBMBHs9M3CKPEw0tfaOxPA58pSDgVAlN5cGHRFdPz2MW7kHB1KHJGYiYWOnX62mw/exec";
 
     let allData = [];
-    let cart = []; // 購物車陣列
+    let cart = [];
 
     // ==========================================
-    // 🗄️ 跨平台本機快取核心 (雙重相容保護)
+    // 🗄️ 跨平台本機快取核心
     // ==========================================
     const CACHE_KEY = "TFB_BEARING_LOCAL_DATA";
 
@@ -282,13 +322,34 @@
     }
 
     // ==========================================
-    // ⚡ 核心連線函式 (電腦秒連 + 手機秒開相容版)
+    // 🎨 軸承分類輕量向量圖 (零外部圖檔依賴)
+    // ==========================================
+    function getBearingIconSVG(partNo) {
+        const p = (partNo || '').toUpperCase();
+        
+        // 1. 深溝滾珠 (6開頭)
+        if (/^6\d{2,4}/.test(p)) {
+            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#61b0ff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="5.5" r="1.5" fill="#61b0ff"/><circle cx="12" cy="18.5" r="1.5" fill="#61b0ff"/><circle cx="5.5" cy="12" r="1.5" fill="#61b0ff"/><circle cx="18.5" cy="12" r="1.5" fill="#61b0ff"/></svg>`;
+        }
+        // 2. 連座軸承 (UC, UCP, UCF)
+        if (/^UC/.test(p)) {
+            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="1.8"><path d="M4 18h16M7 18v-4a5 5 0 0 1 10 0v4"/><circle cx="12" cy="11" r="3"/></svg>`;
+        }
+        // 3. 調心滾子 / 圓柱滾子 (2xxxx, NU, NJ)
+        if (/^(2\d{4}|NU|NJ)/.test(p)) {
+            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f3e5ab" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><rect x="11" y="4" width="2" height="3" fill="#f3e5ab"/><rect x="11" y="17" width="2" height="3" fill="#f3e5ab"/></svg>`;
+        }
+        // 4. 預設標準軸承線條
+        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`;
+    }
+
+    // ==========================================
+    // ⚡ 核心連線函式
     // ==========================================
     async function initDB() {
         const loadingEl = document.getElementById('loading');
         const searchInput = document.getElementById('searchInput');
 
-        // 1. 若本機已有歷史快取，立即顯示畫面 (0秒瞬開，不需等待連線)
         const cached = getLocalData();
         if (cached && Array.isArray(cached) && cached.length > 0) {
             allData = cached;
@@ -297,14 +358,13 @@
             renderTable(allData.slice(0, 20));
         }
 
-        // 2. 向 Google 試算表請求最新庫存 (純原生 fetch，無超時中斷干擾)
         try {
             const res = await fetch(GAS_URL);
             const resData = await res.json();
 
             if (resData && resData.data && resData.data.length > 0) {
                 allData = resData.data;
-                setLocalData(allData); // 默默更新本機快取
+                setLocalData(allData);
 
                 loadingEl.style.display = 'none';
                 searchInput.disabled = false;
@@ -391,15 +451,15 @@
             const tags = document.querySelectorAll('.tag');
             tags.forEach(t => t.classList.remove('active'));
             tags[0].classList.add('active');
-            renderTable(allData.slice(0, 15));
+            renderTable(allData.slice(0, 20));
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'cart') {
             toggleModal('cartModal', true);
             renderCart();
-        } else if (action === 'news') {
-            toggleModal('newsModal', true);
-        } else if (action === 'profile') {
-            toggleModal('profileModal', true);
+        } else if (action === 'suffixModal') {
+            toggleModal('suffixModal', true);
+        } else if (action === 'urgentModal') {
+            toggleModal('urgentModal', true);
         }
     }
 
@@ -448,7 +508,7 @@
         const summaryEl = document.getElementById('cartTotalSummary');
         
         if (cart.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">目前購物車尚無品項，請點選品項右側 [+] 加入。</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">目前詢價單尚無品項，請點選品項右側 [+] 加入。</div>`;
             summaryEl.innerText = '0 項';
             return;
         }
@@ -461,7 +521,7 @@
                 <div class="cart-item-card">
                     <div class="cart-item-info">
                         <h4>${item.partNo}</h4>
-                        <p>${item.desc} | 現有庫存: ${item.stock}</p>
+                        <p>${item.desc} | 現有庫存量: ${item.stock}</p>
                     </div>
                     <div class="cart-item-controls">
                         <div style="display:flex; align-items:center; gap:4px;">
@@ -536,7 +596,7 @@
 
     function checkoutOrder() {
         if (cart.length === 0) {
-            alert('購物車目前尚無品項，無法送出訂單！');
+            alert('詢價車目前尚無品項！');
             return;
         }
 
@@ -553,7 +613,7 @@
             message += `${index + 1}. 型號：${item.partNo}\n`;
             message += `   規格：${item.desc}\n`;
             message += `   數量：${item.qty} pcs\n`;
-            message += `   系統庫存：${item.stock}\n\n`;
+            message += `   系統現有庫存量：${item.stock}\n\n`;
         });
 
         message += `============================\n`;
@@ -569,13 +629,18 @@
 
     function contactAgentForSearch() {
         const currentInput = document.getElementById('searchInput').value.trim();
-        let text = `您好，我想請才富軸承客服協助查詢尺寸與報價：`;
+        let text = `您好，我想請才富軸承客服協助查詢規格與報價：`;
         if (currentInput) {
             text += `\n【欲查詢型號/尺寸】：${currentInput}`;
         } else {
             text += `\n(我有特殊規格/止推/滾針尺寸需要比對)`;
         }
         
+        launchLineDirect(text);
+    }
+
+    function launchPhotoInquiry() {
+        const text = `才富軸承您好，我這邊有機台軸承需要拍照代查：\n(稍後送出軸承端面照片與量測尺寸，請協助報價與確認現貨)`;
         launchLineDirect(text);
     }
 
@@ -611,8 +676,15 @@
     function renderTable(items) {
         document.getElementById('resultBody').innerHTML = items.map(item => `
             <tr>
-                <td class="td-partno" onclick="copyToClipboard('${item.p}')" title="點擊複製">${item.p}</td>
-                <td>${item.d}</td>
+                <td class="bearing-icon-cell">
+                    <div class="bearing-mini-icon">
+                        ${getBearingIconSVG(item.p)}
+                    </div>
+                </td>
+                <td>
+                    <div class="td-partno" onclick="copyToClipboard('${item.p}')" title="點擊複製">${item.p}</div>
+                    <div class="td-desc">${item.d || '規格待查'}</div>
+                </td>
                 <td style="text-align: right; white-space: nowrap;">
                     <span class="stock-badge ${Number(item.s) <= 0 ? 'stock-zero' : 'stock-ok'}">${item.s || 0}</span>
                     <button class="add-row-cart-btn" onclick="addToCartFromTable('${item.p}', '${item.d}', '${item.s || 0}')" title="加入詢價清單">＋</button>
