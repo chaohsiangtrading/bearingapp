@@ -62,8 +62,33 @@
         .result-table { width: 100%; border-collapse: collapse; }
         .result-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
         
-        .bearing-icon-cell { width: 44px; text-align: center; }
-        .bearing-mini-icon { width: 36px; height: 36px; background: #151921; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #2d3340; }
+        /* 品牌小標籤專用樣式 */
+        .brand-badge-cell { width: 56px; text-align: center; padding-right: 2px !important; }
+        .brand-badge { 
+            display: inline-block; 
+            font-size: 11px; 
+            font-weight: 800; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 46px;
+        }
+
+        /* 各大廠牌經典專屬識別色 */
+        .brand-skf    { background-color: #002B49; color: #fff; border: 1px solid #005691; } /* SKF 經典深藍 */
+        .brand-nsk    { background-color: #E31B23; color: #fff; border: 1px solid #ff4d53; } /* NSK 標誌紅 */
+        .brand-ntn    { background-color: #0072CE; color: #fff; border: 1px solid #3399ff; } /* NTN 企業藍 */
+        .brand-fag    { background-color: #8B0000; color: #fff; border: 1px solid #c00000; } /* FAG 經典深紅 */
+        .brand-koyo   { background-color: #E60012; color: #fff; border: 1px solid #ff4d53; } /* KOYO 紅 */
+        .brand-nachi  { background-color: #C71585; color: #fff; border: 1px solid #ff4da6; } /* NACHI 不二越 */
+        .brand-timken { background-color: #FF8200; color: #111; border: 1px solid #ffa333; } /* TIMKEN 經典橘黃 */
+        .brand-asahi  { background-color: #008559; color: #fff; border: 1px solid #00b377; } /* ASAHI 連座綠 */
+        .brand-iko    { background-color: #004B87; color: #fff; border: 1px solid #0074d9; } /* IKO 滾針藍 */
+        .brand-nmb    { background-color: #003366; color: #fff; border: 1px solid #2962ff; } /* NMB 美蓓亞 */
+        .brand-ezo    { background-color: #3b5998; color: #fff; border: 1px solid #5b7bd5; } /* EZO 微型 */
+        .brand-other  { background-color: #2c3240; color: #9aa0a6; border: 1px solid #434c5e; } /* 其他/標準品 */
         
         .td-partno { font-weight: bold; color: #61b0ff; cursor: pointer; }
         .td-partno:hover { text-decoration: underline; }
@@ -167,7 +192,7 @@
     <div class="table-card"><table class="result-table"><tbody id="resultBody"></tbody></table></div>
 </div>
 
-<!-- 底部導航欄（改造：首頁、購物車、廠牌代號、傳照急件） -->
+<!-- 底部導航欄（首頁、購物車、廠牌代號、傳照急件） -->
 <footer class="app-footer">
     <button class="footer-item active" onclick="footerNav('home', this)">
         <svg class="footer-icon" viewBox="0 0 1024 1024"><path d="M905.386667 533.76a42.666667 42.666667 0 0 0-26.88-39.253333L533.333333 341.333333a42.666667 42.666667 0 0 0-42.666666 0L145.493333 494.506667a42.666667 42.666667 0 0 0-20.906666 56.32 42.666667 42.666667 0 0 0 56.32 20.906666L512 420.906667l331.093333 150.826666a42.666667 42.666667 0 0 0 56.32-20.906666 42.666667 42.666667 0 0 0 5.973334-17.066667z" fill="currentColor"></path><path d="M853.333333 640v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333H256a85.333333 85.333333 0 0 1-85.333333-85.333333V640h-42.666667v170.666667a128 128 0 0 0 128 128h512a128 128 0 0 0 128-128V640h-42.666667z" fill="currentColor"></path></svg>
@@ -322,25 +347,36 @@
     }
 
     // ==========================================
-    // 🎨 軸承分類輕量向量圖 (零外部圖檔依賴)
+    // 🏷️ 軸承品牌自動辨識與彩色標籤
     // ==========================================
-    function getBearingIconSVG(partNo) {
-        const p = (partNo || '').toUpperCase();
-        
-        // 1. 深溝滾珠 (6開頭)
-        if (/^6\d{2,4}/.test(p)) {
-            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#61b0ff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="5.5" r="1.5" fill="#61b0ff"/><circle cx="12" cy="18.5" r="1.5" fill="#61b0ff"/><circle cx="5.5" cy="12" r="1.5" fill="#61b0ff"/><circle cx="18.5" cy="12" r="1.5" fill="#61b0ff"/></svg>`;
+    function getBrandBadgeHTML(partNo, desc) {
+        const fullText = ((partNo || '') + ' ' + (desc || '')).toUpperCase();
+
+        if (fullText.includes('SKF')) {
+            return `<span class="brand-badge brand-skf">SKF</span>`;
+        } else if (fullText.includes('NSK')) {
+            return `<span class="brand-badge brand-nsk">NSK</span>`;
+        } else if (fullText.includes('NTN')) {
+            return `<span class="brand-badge brand-ntn">NTN</span>`;
+        } else if (fullText.includes('FAG') || fullText.includes('INA')) {
+            return `<span class="brand-badge brand-fag">FAG</span>`;
+        } else if (fullText.includes('KOYO') || fullText.includes('JTEKT')) {
+            return `<span class="brand-badge brand-koyo">KOYO</span>`;
+        } else if (fullText.includes('NACHI')) {
+            return `<span class="brand-badge brand-nachi">NACHI</span>`;
+        } else if (fullText.includes('TIMKEN')) {
+            return `<span class="brand-badge brand-timken">TIMKEN</span>`;
+        } else if (fullText.includes('ASAHI') || /^UC/i.test(partNo.trim())) {
+            return `<span class="brand-badge brand-asahi">ASAHI</span>`;
+        } else if (fullText.includes('IKO')) {
+            return `<span class="brand-badge brand-iko">IKO</span>`;
+        } else if (fullText.includes('NMB')) {
+            return `<span class="brand-badge brand-nmb">NMB</span>`;
+        } else if (fullText.includes('EZO')) {
+            return `<span class="brand-badge brand-ezo">EZO</span>`;
+        } else {
+            return `<span class="brand-badge brand-other">現貨</span>`;
         }
-        // 2. 連座軸承 (UC, UCP, UCF)
-        if (/^UC/.test(p)) {
-            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="1.8"><path d="M4 18h16M7 18v-4a5 5 0 0 1 10 0v4"/><circle cx="12" cy="11" r="3"/></svg>`;
-        }
-        // 3. 調心滾子 / 圓柱滾子 (2xxxx, NU, NJ)
-        if (/^(2\d{4}|NU|NJ)/.test(p)) {
-            return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f3e5ab" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><rect x="11" y="4" width="2" height="3" fill="#f3e5ab"/><rect x="11" y="17" width="2" height="3" fill="#f3e5ab"/></svg>`;
-        }
-        // 4. 預設標準軸承線條
-        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`;
     }
 
     // ==========================================
@@ -676,10 +712,8 @@
     function renderTable(items) {
         document.getElementById('resultBody').innerHTML = items.map(item => `
             <tr>
-                <td class="bearing-icon-cell">
-                    <div class="bearing-mini-icon">
-                        ${getBearingIconSVG(item.p)}
-                    </div>
+                <td class="brand-badge-cell">
+                    ${getBrandBadgeHTML(item.p, item.d)}
                 </td>
                 <td>
                     <div class="td-partno" onclick="copyToClipboard('${item.p}')" title="點擊複製">${item.p}</div>
